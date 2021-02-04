@@ -8,14 +8,17 @@ import android.widget.TextView;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.LiveData;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
 import org.henryschmale.counter.CountedEventDatabase;
+import org.henryschmale.counter.EventDetailVoteAdapter;
 import org.henryschmale.counter.R;
 import org.henryschmale.counter.models.CountedEvent;
 import org.henryschmale.counter.models.EventTypeDetail;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class EventDetailActivity extends AppCompatActivity {
@@ -42,6 +45,9 @@ public class EventDetailActivity extends AppCompatActivity {
             ((TextView)findViewById(R.id.decr_count)).setText(Long.toString(eventTypeDetail.decrementCount));
             ((TextView)findViewById(R.id.event_type_description)).setText(eventTypeDetail.description);
 
+            LiveData<List<CountedEvent>> events = db.countedEventTypeDao().getCountedEventsOfType(eventTypeDetail.uid);
+
+            ((RecyclerView)findViewById(R.id.vote_list)).setAdapter(new EventDetailVoteAdapter(events, this));
         });
     }
 }
