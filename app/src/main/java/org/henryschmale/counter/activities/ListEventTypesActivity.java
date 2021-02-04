@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import org.henryschmale.counter.CountedEventDatabase;
 import org.henryschmale.counter.CountedEventTypeDao;
@@ -74,12 +75,14 @@ public class ListEventTypesActivity extends AppCompatActivity implements LongCli
         Intent intent;
         switch (item.getItemId()) {
             case R.id.menuAbout:
+                Toast.makeText(this, R.string.about_toast, Toast.LENGTH_LONG).show();
                 break;
             case R.id.menuExport:
                 intent = new Intent(this, ExportActivity.class);
                 startActivityForResult(intent, EXPORT_REQUEST_CODE);
                 break;
             case R.id.menuSettings:
+                Toast.makeText(this, R.string.to_be_implemented, Toast.LENGTH_LONG).show();
                 break;
         }
 

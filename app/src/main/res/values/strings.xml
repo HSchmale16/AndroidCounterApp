@@ -12,4 +12,7 @@
     <string name="settings">Settings</string>
     <string name="export_your_data">Export Your Data</string>
     <string name="about">About</string>
+    <string name="to_be_implemented">This feature is not yet implemented, but it is coming soon.</string>
+
+    <string name="about_toast">This is an app created by Henry Schmale</string>
 </resources>
