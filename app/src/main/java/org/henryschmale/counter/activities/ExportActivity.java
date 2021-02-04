@@ -12,5 +12,7 @@ public class ExportActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_export);
+
+        getSupportActionBar().setTitle(R.string.export_your_data);
     }
 }

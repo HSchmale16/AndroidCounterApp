@@ -14,6 +14,7 @@ import java.time.OffsetDateTime;
     "SELECT " +
             "event_type_name as eventTypeName, " +
             "CountedEventType.uid, " +
+            "CountedEventType.event_type_description as description, " +
             "CountedEventType.createdAt as eventTypeCreated, " +
             "SUM(CountedEvent.increment) as netScore, " +
             "COUNT(*) as voteCount, " +
@@ -29,6 +30,8 @@ public class EventTypeDetail {
     public int uid;
 
     public String eventTypeName;
+
+    public String description;
 
     public OffsetDateTime eventTypeCreated;
 

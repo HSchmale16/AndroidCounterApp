@@ -11,7 +11,7 @@ import org.henryschmale.counter.models.CountedEventType;
 import org.henryschmale.counter.models.EventTypeDetail;
 
 @Database(
-        version = 6,
+        version = 7,
         entities = {
                 CountedEventType.class,
                 CountedEvent.class

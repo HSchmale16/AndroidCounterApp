@@ -11,6 +11,8 @@ import org.henryschmale.counter.models.CountedEvent;
 import org.henryschmale.counter.models.CountedEventType;
 import org.henryschmale.counter.models.EventTypeDetail;
 
+import java.util.List;
+
 @Dao
 public interface CountedEventTypeDao {
     @Insert
@@ -27,6 +29,9 @@ public interface CountedEventTypeDao {
 
     @Query("SELECT COUNT(*) FROM CountedEventType")
     ListenableFuture<Integer> totalCount();
+
+    @Query("SELECT * FROM CountedEvent WHERE CountedEvent.countedEventTypeId = :id ORDER BY datetime(createdAt) DESC")
+    LiveData<List<CountedEvent>> getCountedEventsOfType(int id);
 
     @Insert
     void addCountedEvent(CountedEvent event);
