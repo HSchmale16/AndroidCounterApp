@@ -9,9 +9,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Counter">
-        <activity android:name=".CreateEventTypeActivity"></activity>
+        <activity android:name=".activities.EventDetailActivity"></activity>
+        <activity android:name=".activities.ExportActivity" />
+        <activity android:name=".activities.CreateEventTypeActivity" />
         <activity
-            android:name=".ListEventTypesActivity"
+            android:name=".activities.ListEventTypesActivity"
             android:theme="@style/Theme.Counter.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -19,7 +21,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity" />
     </application>
 
 </manifest>

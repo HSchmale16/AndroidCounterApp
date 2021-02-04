@@ -1,4 +1,4 @@
-package org.henryschmale.counter;
+package org.henryschmale.counter.models;
 
 import androidx.room.DatabaseView;
 import androidx.room.TypeConverters;

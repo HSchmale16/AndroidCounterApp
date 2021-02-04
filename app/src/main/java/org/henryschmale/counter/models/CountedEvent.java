@@ -1,4 +1,4 @@
-package org.henryschmale.counter;
+package org.henryschmale.counter.models;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
@@ -9,7 +9,6 @@ import androidx.room.TypeConverters;
 import org.henryschmale.counter.utils.DateConverter;
 
 import java.time.OffsetDateTime;
-import java.util.Date;
 
 /**
  * A count instance

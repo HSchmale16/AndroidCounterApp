@@ -1,12 +1,15 @@
 package org.henryschmale.counter;
 
 import androidx.lifecycle.LiveData;
-import androidx.paging.PagedList;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
 
 import com.google.common.util.concurrent.ListenableFuture;
+
+import org.henryschmale.counter.models.CountedEvent;
+import org.henryschmale.counter.models.CountedEventType;
+import org.henryschmale.counter.models.EventTypeDetail;
 
 @Dao
 public interface CountedEventTypeDao {

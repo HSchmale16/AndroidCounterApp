@@ -6,6 +6,10 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
+import org.henryschmale.counter.models.CountedEvent;
+import org.henryschmale.counter.models.CountedEventType;
+import org.henryschmale.counter.models.EventTypeDetail;
+
 @Database(
         version = 6,
         entities = {

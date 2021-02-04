@@ -1,4 +1,4 @@
-package org.henryschmale.counter;
+package org.henryschmale.counter.models;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;

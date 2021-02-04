@@ -7,7 +7,9 @@
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="title_activity_list_or_create_event_type">ListOrCreateEventTypeActivity</string>
+    <string name="event_description">Event<br />Description</string>
+    <string name="settings">Settings</string>
+    <string name="export_your_data">Export Your Data</string>
+    <string name="about">About</string>
 </resources>

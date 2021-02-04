@@ -1,7 +1,6 @@
-package org.henryschmale.counter;
+package org.henryschmale.counter.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.room.Room;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,10 +11,14 @@ import android.widget.EditText;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
+import org.henryschmale.counter.CountedEventDatabase;
+import org.henryschmale.counter.CountedEventTypeDao;
+import org.henryschmale.counter.R;
+import org.henryschmale.counter.models.CountedEventType;
+
 import java.util.concurrent.ExecutionException;
 
 public class CreateEventTypeActivity extends AppCompatActivity {
-    public static final int CREATE_EVENT_REQUEST_CODE = 1;
     public static final String TAG = "CreateEventTypeActivity";
 
     Button submitButton;
@@ -67,8 +70,8 @@ public class CreateEventTypeActivity extends AppCompatActivity {
 
                     setResult(RESULT_OK, intent);
                     finish();
-                } catch (ExecutionException|InterruptedException fuckYou) {
-                    Log.w(TAG, fuckYou.getLocalizedMessage());
+                } catch (ExecutionException|InterruptedException e) {
+                    Log.w(TAG, e.getLocalizedMessage(), e);
                 }
             }
         });

@@ -8,28 +8,26 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
-import androidx.paging.PagedList;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
-import java.util.List;
+import org.henryschmale.counter.models.CountedEvent;
+import org.henryschmale.counter.models.EventTypeDetail;
+
 import java.util.concurrent.ExecutionException;
 
 public class CountedEventTypeListAdapter extends RecyclerView.Adapter<CountedEventTypeListAdapter.ViewHolder> {
     public static final String TAG = "APP_CET_Adapter";
     CountedEventTypeDao dao;
-    LifecycleOwner owner;
+    LongClickRecyclerHandler owner;
 
-    public CountedEventTypeListAdapter(CountedEventTypeDao dao, LifecycleOwner owner) {
+    public CountedEventTypeListAdapter(CountedEventTypeDao dao, LongClickRecyclerHandler owner) {
         this.dao = dao;
         this.owner = owner;
-
     }
-
 
     @NonNull
     @Override
@@ -62,7 +60,7 @@ public class CountedEventTypeListAdapter extends RecyclerView.Adapter<CountedEve
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder
-            implements View.OnClickListener {
+            implements View.OnClickListener, View.OnLongClickListener {
 
         private final TextView eventNameText;
         private final TextView counterText;
@@ -83,7 +81,10 @@ public class CountedEventTypeListAdapter extends RecyclerView.Adapter<CountedEve
 
             this.incrButton.setOnClickListener(this);
             this.decrButton.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
+
+
 
         public void setLiveDataSource(LiveData<EventTypeDetail> details, int position) {
             // remove old references so no conflicts
@@ -126,6 +127,13 @@ public class CountedEventTypeListAdapter extends RecyclerView.Adapter<CountedEve
             event.increment = direction;
 
             this.dao.addCountedEvent(event);
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            Log.d(TAG, "Long click detected");
+            owner.handleLongClick(currentEventUid);
+            return true;
         }
     }
 }

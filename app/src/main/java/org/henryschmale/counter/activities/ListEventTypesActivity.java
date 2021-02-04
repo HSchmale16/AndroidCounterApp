@@ -1,24 +1,32 @@
-package org.henryschmale.counter;
+package org.henryschmale.counter.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.room.Room;
 
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 
-public class ListEventTypesActivity extends AppCompatActivity {
+import org.henryschmale.counter.CountedEventDatabase;
+import org.henryschmale.counter.CountedEventTypeDao;
+import org.henryschmale.counter.CountedEventTypeListAdapter;
+import org.henryschmale.counter.LongClickRecyclerHandler;
+import org.henryschmale.counter.R;
+
+public class ListEventTypesActivity extends AppCompatActivity implements LongClickRecyclerHandler {
     CountedEventTypeListAdapter theStupidAdapter;
+    public static final int CREATE_EVENT_REQUEST_CODE = 1;
+    public static final int EXPORT_REQUEST_CODE = 2;
+    public static final int EVENT_DETAIL_REQUEST_CODE = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,13 +34,14 @@ public class ListEventTypesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_list_event_types);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        toolbar.setTitle("Event Counting App");
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(ListEventTypesActivity.this, CreateEventTypeActivity.class);
-                startActivityForResult(intent, CreateEventTypeActivity.CREATE_EVENT_REQUEST_CODE);
+                startActivityForResult(intent, CREATE_EVENT_REQUEST_CODE);
             }
         });
 
@@ -48,7 +57,7 @@ public class ListEventTypesActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CreateEventTypeActivity.CREATE_EVENT_REQUEST_CODE) {
+        if (requestCode == CREATE_EVENT_REQUEST_CODE) {
             theStupidAdapter.notifyItemChanged(data.getIntExtra("newItemId", 50));
         }
     }
@@ -60,4 +69,27 @@ public class ListEventTypesActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        Intent intent;
+        switch (item.getItemId()) {
+            case R.id.menuAbout:
+                break;
+            case R.id.menuExport:
+                intent = new Intent(this, ExportActivity.class);
+                startActivityForResult(intent, EXPORT_REQUEST_CODE);
+                break;
+            case R.id.menuSettings:
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void handleLongClick(int id) {
+        Intent intent = new Intent(this, EventDetailActivity.class);
+        intent.putExtra(EventDetailActivity.EXTRA_EVENT_DETAIL_ID, id);
+        startActivityForResult(intent, EVENT_DETAIL_REQUEST_CODE);
+    }
 }
