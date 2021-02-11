@@ -9,7 +9,9 @@
         android:roundIcon="@mipmap/app_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Counter">
-        <activity android:name=".activities.EventDetailActivity"></activity>
+        <activity
+            android:name=".activities.EventDetailActivity"
+            android:theme="@style/Theme.Counter.NoActionBar" />
         <activity android:name=".activities.ExportActivity" />
         <activity android:name=".activities.CreateEventTypeActivity" />
         <activity
@@ -21,7 +23,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
     </application>
 
 </manifest>

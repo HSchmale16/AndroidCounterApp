@@ -12,21 +12,65 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.common.util.concurrent.ListenableFuture;
-
 import org.henryschmale.counter.models.CountedEvent;
+import org.henryschmale.counter.models.CountedEventType;
 import org.henryschmale.counter.models.EventTypeDetail;
 
-import java.util.concurrent.ExecutionException;
+import java.util.List;
 
 public class CountedEventTypeListAdapter extends RecyclerView.Adapter<CountedEventTypeListAdapter.ViewHolder> {
     public static final String TAG = "APP_CET_Adapter";
     CountedEventTypeDao dao;
+    List<CountedEventType> eventTypeDetails;
+    LiveData<List<CountedEventType>> countedEventType;
     LongClickRecyclerHandler owner;
 
+    public enum SortOrder {
+        BY_NAME_A_Z,
+        BY_NAME_Z_A,
+        OLDEST_CREATED,
+        NEWEST_CREATED
+    };
+
+    SortOrder sortOrder;
+
     public CountedEventTypeListAdapter(CountedEventTypeDao dao, LongClickRecyclerHandler owner) {
-        this.dao = dao;
         this.owner = owner;
+        this.dao = dao;
+        this.setSortOrder(SortOrder.BY_NAME_A_Z);
+    }
+
+    public void setSortOrder(SortOrder sortOrder) {
+        this.sortOrder = sortOrder;
+        if (this.countedEventType != null) {
+            this.countedEventType.removeObservers(owner);
+        }
+
+        switch(this.sortOrder) {
+            case BY_NAME_A_Z:
+                this.countedEventType = dao.getEventTypesOrderByNameAsc();
+                break;
+            case BY_NAME_Z_A:
+                this.countedEventType = dao.getEventTypesOrderByNameDesc();
+                break;
+            case OLDEST_CREATED:
+                this.countedEventType = dao.getEventTypesOrderByOldestCreatedAt();
+                break;
+            case NEWEST_CREATED:
+                this.countedEventType = dao.getEventTypesOrderByNewestCreatedAt();
+                break;
+        }
+
+        this.countedEventType.observe(owner, this::setEventTypeDetails);
+    }
+
+    public SortOrder getSortOrder() {
+        return this.sortOrder;
+    }
+
+    public void setEventTypeDetails(List<CountedEventType> countedEventTypes) {
+        this.eventTypeDetails = countedEventTypes;
+        this.notifyDataSetChanged();
     }
 
     @NonNull
@@ -41,22 +85,14 @@ public class CountedEventTypeListAdapter extends RecyclerView.Adapter<CountedEve
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Log.d(TAG, Integer.toString(position));
 
-        LiveData<EventTypeDetail> cetFuture = dao.getEventDetailById(position + 1);
+        LiveData<EventTypeDetail> cetFuture = dao.getEventDetailById(eventTypeDetails.get(position).uid);
 
         holder.setLiveDataSource(cetFuture, position);
     }
 
     @Override
     public int getItemCount() {
-        try {
-            ListenableFuture<Integer> count = dao.totalCount();
-            return count.get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-        return 0;
+        return eventTypeDetails != null ? eventTypeDetails.size() : 0;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder
@@ -97,6 +133,10 @@ public class CountedEventTypeListAdapter extends RecyclerView.Adapter<CountedEve
             currentEventType.observe(owner, new Observer<EventTypeDetail>() {
                 @Override
                 public void onChanged(EventTypeDetail eventTypeDetail) {
+                    if (eventTypeDetail == null) {
+                        currentEventType.removeObservers(owner);
+                        return;
+                    }
                     currentEventUid = eventTypeDetail.uid;
                     updateFrom(eventTypeDetail);
                 }

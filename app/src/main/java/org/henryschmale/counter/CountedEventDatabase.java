@@ -11,7 +11,7 @@ import org.henryschmale.counter.models.CountedEventType;
 import org.henryschmale.counter.models.EventTypeDetail;
 
 @Database(
-        version = 7,
+        version = 8,
         entities = {
                 CountedEventType.class,
                 CountedEvent.class
@@ -19,7 +19,7 @@ import org.henryschmale.counter.models.EventTypeDetail;
         views = {
                 EventTypeDetail.class
         },
-        exportSchema = false
+        exportSchema = true
 )
 public abstract class CountedEventDatabase extends RoomDatabase {
         private static CountedEventDatabase INSTANCE = null;

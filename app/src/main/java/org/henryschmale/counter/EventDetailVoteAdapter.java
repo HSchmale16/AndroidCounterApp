@@ -22,10 +22,15 @@ public class EventDetailVoteAdapter extends RecyclerView.Adapter<EventDetailVote
     public static final String TAG = "EventDetailVoteAdapter";
     List<CountedEvent> events;
     Activity activity;
+    final int downvoteColor;
+    final int upvoteColor;
 
 
     public EventDetailVoteAdapter(LiveData<List<CountedEvent>> events, Activity activity) {
         this.activity = activity;
+        this.upvoteColor = activity.getResources().getColor(R.color.up_vote_color, activity.getTheme());
+        this.downvoteColor = activity.getResources().getColor(R.color.down_vote_color, activity.getTheme());
+
         events.observe((LifecycleOwner) activity, new Observer<List<CountedEvent>>() {
             @Override
             public void onChanged(List<CountedEvent> countedEvents) {
@@ -71,9 +76,9 @@ public class EventDetailVoteAdapter extends RecyclerView.Adapter<EventDetailVote
             Log.d(TAG, event.toString());
 
             if (event.increment > 0) {
-                indicator.setBackgroundColor(activity.getResources().getColor(R.color.green));
+                indicator.setBackgroundColor(upvoteColor);
             } else {
-                indicator.setBackgroundColor(activity.getResources().getColor(R.color.red));
+                indicator.setBackgroundColor(downvoteColor);
             }
 
             this.when.setText(event.createdAt.toString());

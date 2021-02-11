@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group
+        android:checkableBehavior="single">
+
+        <item android:id="@+id/menu_sort_by_name_asc"
+            android:title="Name (A-Z)"/>
+        <item android:id="@+id/menu_sort_by_name_desc"
+            android:title="Name (Z-A)"/>
+        <item android:id="@+id/menu_sort_by_created_at_newest"
+            android:title="@string/most_recently_created"/>
+        <item android:id="@+id/menu_sort_by_created_at_oldest"
+            android:title="Oldest Created"/>
+    </group>
+
+    <item
+        android:id="@+id/menuAbout"
+        android:title="@string/about" />
+
+    <item
+        android:id="@+id/menuSettings"
+        android:title="@string/settings" />
+
+    <item
+        android:id="@+id/menuExport"
+        android:title="@string/export_your_data" />
+
+</menu>

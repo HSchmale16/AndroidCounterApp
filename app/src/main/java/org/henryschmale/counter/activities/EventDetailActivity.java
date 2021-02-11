@@ -1,21 +1,31 @@
 package org.henryschmale.counter.activities;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import org.henryschmale.counter.CountedEventDatabase;
 import org.henryschmale.counter.EventDetailVoteAdapter;
 import org.henryschmale.counter.R;
 import org.henryschmale.counter.models.CountedEvent;
+import org.henryschmale.counter.models.CountedEventType;
 import org.henryschmale.counter.models.EventTypeDetail;
 
 import java.util.List;
@@ -24,30 +34,91 @@ import java.util.concurrent.ExecutionException;
 public class EventDetailActivity extends AppCompatActivity {
     public final static String EXTRA_EVENT_DETAIL_ID = "EVENT_DETAIL_ID";
     public final static String TAG = "EventDetailActivity";
+    int targetEventTypeId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_detail);
-        getSupportActionBar().setTitle("TESTING");
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        int eventId = getIntent().getIntExtra(EXTRA_EVENT_DETAIL_ID, 1);
+        targetEventTypeId = getIntent().getIntExtra(EXTRA_EVENT_DETAIL_ID, -1);
 
-        Log.d(TAG, Integer.toString(eventId));
+        Log.d(TAG, Integer.toString(targetEventTypeId));
 
         CountedEventDatabase db = CountedEventDatabase.getInstance(getApplicationContext());
 
-        LiveData<EventTypeDetail> eventListenableFuture = db.countedEventTypeDao().getEventDetailById(eventId);
+        LiveData<EventTypeDetail> eventTypeDetailLiveData = db.countedEventTypeDao().getEventDetailById(targetEventTypeId);
 
-        eventListenableFuture.observe(this, eventTypeDetail -> {
-            getSupportActionBar().setTitle(eventTypeDetail.eventTypeName);
-            ((TextView)findViewById(R.id.incr_count)).setText(Long.toString(eventTypeDetail.incrementCount));
-            ((TextView)findViewById(R.id.decr_count)).setText(Long.toString(eventTypeDetail.decrementCount));
-            ((TextView)findViewById(R.id.event_type_description)).setText(eventTypeDetail.description);
+        eventTypeDetailLiveData.observe(this, eventTypeDetail -> {
+            if (eventTypeDetail != null) {
+                getSupportActionBar().setTitle(eventTypeDetail.eventTypeName);
 
-            LiveData<List<CountedEvent>> events = db.countedEventTypeDao().getCountedEventsOfType(eventTypeDetail.uid);
+                ((TextView) findViewById(R.id.net_count)).setText(Long.toString(eventTypeDetail.netScore));
+                ((TextView) findViewById(R.id.incr_count)).setText(Long.toString(eventTypeDetail.incrementCount));
+                ((TextView) findViewById(R.id.decr_count)).setText(Long.toString(eventTypeDetail.decrementCount));
+                ((TextView) findViewById(R.id.total_vote_count)).setText(Long.toString(eventTypeDetail.voteCount));
+                ((TextView) findViewById(R.id.event_type_description)).setText(eventTypeDetail.description);
 
-            ((RecyclerView)findViewById(R.id.vote_list)).setAdapter(new EventDetailVoteAdapter(events, this));
+                LiveData<List<CountedEvent>> events = db.countedEventTypeDao().getCountedEventsOfType(eventTypeDetail.uid);
+
+                ((RecyclerView) findViewById(R.id.vote_list)).setAdapter(new EventDetailVoteAdapter(events, this));
+            }
+        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.detail_action_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.delete_event_type) {
+
+            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which){
+                        case DialogInterface.BUTTON_POSITIVE:
+                            //Yes button clicked
+                            deleteAttachedEventType();
+                            break;
+
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            //No button clicked
+                            Toast.makeText(getApplicationContext(), "It's safe", Toast.LENGTH_LONG).show();
+                            break;
+                    }
+                }
+            };
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder
+                    .setMessage("Are you sure you want to delete this event type? (It can't be undone)")
+                    .setPositiveButton("Yes I am 100% sure", dialogClickListener)
+                    .setNegativeButton("No I want to keep this type", dialogClickListener)
+                    .show();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void deleteAttachedEventType() {
+        Log.d(TAG, "Deleting item " + targetEventTypeId);
+
+        CountedEventDatabase db = CountedEventDatabase.getInstance(getApplicationContext());
+        LiveData<CountedEventType> eventType = db.countedEventTypeDao().getEventTypeById(targetEventTypeId);
+        eventType.observe(this, new Observer<CountedEventType>() {
+            @Override
+            public void onChanged(CountedEventType countedEventType) {
+                db.countedEventTypeDao().deleteEventType(countedEventType);
+                eventType.removeObservers(EventDetailActivity.this);
+                setResult(RESULT_OK);
+                finish();
+            }
         });
     }
 }

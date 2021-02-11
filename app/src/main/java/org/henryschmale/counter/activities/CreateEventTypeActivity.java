@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -24,6 +26,7 @@ public class CreateEventTypeActivity extends AppCompatActivity {
     Button submitButton;
     EditText nameField;
     EditText descriptionField;
+    CountedEventTypeDao dao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,9 +35,28 @@ public class CreateEventTypeActivity extends AppCompatActivity {
 
         Log.i(TAG, "Created the activity");
 
-        CountedEventTypeDao dao = CountedEventDatabase.getInstance(getApplicationContext()).countedEventTypeDao();
+        dao = CountedEventDatabase.getInstance(getApplicationContext()).countedEventTypeDao();
 
         nameField = findViewById(R.id.event_type_name);
+
+        nameField.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String text = editable.toString();
+                checkNameFieldValidity(text);
+            }
+        });
+
         descriptionField = findViewById(R.id.event_type_description);
         submitButton = findViewById(R.id.submit_button);
 
@@ -45,35 +67,40 @@ public class CreateEventTypeActivity extends AppCompatActivity {
 
                 Log.i(TAG, "Clicked submit button");
 
-                try {
-                    ListenableFuture<Integer> future = dao.countEventTypeName(requestName);
+                checkNameFieldValidity(requestName);
 
-                    if (future.get() > 0) {
-                        nameField.setError("The requested event type name already exists.");
-                        return;
-                    } else {
-                        Log.i(TAG, "Future count = " + future.get());
-                    }
+                String description = descriptionField.getText().toString();
 
-                    String description = descriptionField.getText().toString();
+                CountedEventType cet = new CountedEventType();
+                cet.eventTypeName = requestName;
+                cet.eventTypeDescription = description;
 
-                    CountedEventType cet = new CountedEventType();
-                    cet.eventTypeName = requestName;
-                    cet.eventTypeDescription = description;
+                Log.d(TAG, cet.eventTypeName);
 
-                    Log.d(TAG, cet.eventTypeName);
-
-                    long id = dao.addCountedEventType(cet);
-                    Intent intent = new Intent();
-                    intent.putExtra("newItemId", id);
+                long id = dao.addCountedEventType(cet);
+                Intent intent = new Intent();
+                intent.putExtra("newItemId", id);
 
 
-                    setResult(RESULT_OK, intent);
-                    finish();
-                } catch (ExecutionException|InterruptedException e) {
-                    Log.w(TAG, e.getLocalizedMessage(), e);
-                }
+                setResult(RESULT_OK, intent);
+                finish();
             }
         });
+    }
+
+    public boolean checkNameFieldValidity(String text) {
+        try {
+            ListenableFuture<Integer> future = dao.countEventTypeName(text);
+
+            if (future.get() > 0) {
+                nameField.setError("The requested event type name already exists.");
+                return false;
+            } else {
+                Log.i(TAG, "Future count = " + future.get());
+            }
+        } catch (ExecutionException|InterruptedException e) {
+            Log.w(TAG, e.getLocalizedMessage(), e);
+        }
+        return true;
     }
 }

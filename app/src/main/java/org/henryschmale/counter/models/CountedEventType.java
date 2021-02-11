@@ -1,9 +1,12 @@
 package org.henryschmale.counter.models;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
+import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
+import androidx.room.Relation;
 import androidx.room.TypeConverters;
 
 import org.henryschmale.counter.utils.DateConverter;
@@ -21,6 +24,7 @@ public class CountedEventType {
     @PrimaryKey(autoGenerate = true)
     public int uid;
 
+    @NonNull
     @ColumnInfo(name = "event_type_name")
     public String eventTypeName;
 
@@ -28,4 +32,5 @@ public class CountedEventType {
     public String eventTypeDescription;
 
     public OffsetDateTime createdAt = OffsetDateTime.now();
+
 }

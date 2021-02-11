@@ -15,4 +15,12 @@
     <string name="to_be_implemented">This feature is not yet implemented, but it is coming soon.</string>
 
     <string name="about_toast">This is an app created by Henry Schmale</string>
+    <string name="create_event_type">Create Event Type</string>
+
+    <string name="int_format">%d</string>
+    <string name="no_description_attached_here">No description attached here</string>
+    <string name="delete_event_type">Delete Event Type</string>
+    <string name="most_recently_created">Most Recently Created</string>
+
+
 </resources>

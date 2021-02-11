@@ -23,8 +23,10 @@ import org.henryschmale.counter.CountedEventTypeListAdapter;
 import org.henryschmale.counter.LongClickRecyclerHandler;
 import org.henryschmale.counter.R;
 
+import static org.henryschmale.counter.CountedEventTypeListAdapter.SortOrder.*;
+
 public class ListEventTypesActivity extends AppCompatActivity implements LongClickRecyclerHandler {
-    CountedEventTypeListAdapter theStupidAdapter;
+    CountedEventTypeListAdapter eventTypeAdapter;
     public static final int CREATE_EVENT_REQUEST_CODE = 1;
     public static final int EXPORT_REQUEST_CODE = 2;
     public static final int EVENT_DETAIL_REQUEST_CODE = 3;
@@ -50,30 +52,47 @@ public class ListEventTypesActivity extends AppCompatActivity implements LongCli
 
         RecyclerView list = findViewById(R.id.event_type_list);
 
-        theStupidAdapter = new CountedEventTypeListAdapter(dao, this);
+        eventTypeAdapter = new CountedEventTypeListAdapter(dao, this);
 
-        list.setAdapter(theStupidAdapter);
+        list.setAdapter(eventTypeAdapter);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CREATE_EVENT_REQUEST_CODE) {
-            theStupidAdapter.notifyItemChanged(data.getIntExtra("newItemId", 50));
+            assert data != null;
+            eventTypeAdapter.notifyItemChanged(data.getIntExtra("newItemId", 50));
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.menu, menu);
+        menuInflater.inflate(R.menu.main_menu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         Intent intent;
+
+        if (item.isCheckable()) {
+            item.setChecked(true);
+        }
         switch (item.getItemId()) {
+            case R.id.menu_sort_by_created_at_newest:
+                this.eventTypeAdapter.setSortOrder(NEWEST_CREATED);
+                break;
+            case R.id.menu_sort_by_created_at_oldest:
+                this.eventTypeAdapter.setSortOrder(OLDEST_CREATED);
+                break;
+            case R.id.menu_sort_by_name_asc:
+                this.eventTypeAdapter.setSortOrder(BY_NAME_A_Z);
+                break;
+            case R.id.menu_sort_by_name_desc:
+                this.eventTypeAdapter.setSortOrder(BY_NAME_Z_A);
+                break;
             case R.id.menuAbout:
                 Toast.makeText(this, R.string.about_toast, Toast.LENGTH_LONG).show();
                 break;
