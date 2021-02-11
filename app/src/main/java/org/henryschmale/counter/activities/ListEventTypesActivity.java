@@ -1,6 +1,8 @@
 package org.henryschmale.counter.activities;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -11,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,6 +29,7 @@ import org.henryschmale.counter.R;
 import static org.henryschmale.counter.CountedEventTypeListAdapter.SortOrder.*;
 
 public class ListEventTypesActivity extends AppCompatActivity implements LongClickRecyclerHandler {
+    public static final String TAG = "ListEventTypesActivity";
     CountedEventTypeListAdapter eventTypeAdapter;
     public static final int CREATE_EVENT_REQUEST_CODE = 1;
     public static final int EXPORT_REQUEST_CODE = 2;
@@ -94,7 +98,15 @@ public class ListEventTypesActivity extends AppCompatActivity implements LongCli
                 this.eventTypeAdapter.setSortOrder(BY_NAME_Z_A);
                 break;
             case R.id.menuAbout:
-                Toast.makeText(this, R.string.about_toast, Toast.LENGTH_LONG).show();
+                try {
+                    PackageInfo pInfo = this.getPackageManager().getPackageInfo(this.getPackageName(), 0);
+                    String aboutText = getResources().getString(R.string.about_toast, pInfo.versionCode);
+                    Toast.makeText(this, aboutText, Toast.LENGTH_LONG).show();
+                } catch (PackageManager.NameNotFoundException e) {
+                    Log.e(TAG, "Failed to get package info", e);
+                    Toast.makeText(this, "Failed to get package info. Still made by Henry Schmale though", Toast.LENGTH_SHORT).show();
+                }
+
                 break;
             case R.id.menuExport:
                 intent = new Intent(this, ExportActivity.class);

@@ -14,7 +14,7 @@
     <string name="about">About</string>
     <string name="to_be_implemented">This feature is not yet implemented, but it is coming soon.</string>
 
-    <string name="about_toast">This is an app created by Henry Schmale</string>
+    <string name="about_toast">This is an app created by Henry Schmale. Current app version code is %d</string>
     <string name="create_event_type">Create Event Type</string>
 
     <string name="int_format">%d</string>
