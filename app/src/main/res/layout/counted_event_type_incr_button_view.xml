@@ -33,32 +33,33 @@
             android:text="Counter" />
 
         <LinearLayout
+            style="?android:attr/buttonBarStyle"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:orientation="horizontal"
-            style="?android:attr/buttonBarStyle"
-            android:layout_weight="1"
-            android:layout_gravity="center_horizontal">
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1">
 
             <Button
                 android:id="@+id/btn_decrement"
                 style="?android:buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:layout_margin="5dp"
-                android:text="-1"
+                android:background="@color/down_vote_color"
                 android:backgroundTint="@color/down_vote_color"
-                android:layout_gravity="center_horizontal" />
+                android:drawableLeft="@drawable/ic_baseline_remove_circle_outline_24" />
 
             <Button
                 android:id="@+id/btn_increment"
                 style="?android:buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:layout_margin="5dp"
+                android:background="@color/up_vote_color"
                 android:backgroundTint="@color/up_vote_color"
-                android:text="+1"
-                android:layout_gravity="center_horizontal" />
+                android:drawableRight="@drawable/ic_baseline_add_circle_outline_24" />
 
         </LinearLayout>
     </LinearLayout>

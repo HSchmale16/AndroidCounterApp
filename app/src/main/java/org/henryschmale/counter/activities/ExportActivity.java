@@ -13,6 +13,6 @@ public class ExportActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_export);
 
-        getActionBar().setTitle(R.string.export_your_data);
+        getSupportActionBar().setTitle(R.string.export_your_data);
     }
 }

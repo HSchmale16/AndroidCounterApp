@@ -18,9 +18,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.common.util.concurrent.ListenableFuture;
-
 import org.henryschmale.counter.CountedEventDatabase;
 import org.henryschmale.counter.EventDetailVoteAdapter;
 import org.henryschmale.counter.R;
@@ -29,7 +26,6 @@ import org.henryschmale.counter.models.CountedEventType;
 import org.henryschmale.counter.models.EventTypeDetail;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class EventDetailActivity extends AppCompatActivity {
     public final static String EXTRA_EVENT_DETAIL_ID = "EVENT_DETAIL_ID";
@@ -77,7 +73,7 @@ public class EventDetailActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.delete_event_type) {
+        if (item.getItemId() == R.id.menu_delete_event_type) {
 
             DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                 @Override
@@ -98,9 +94,10 @@ public class EventDetailActivity extends AppCompatActivity {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder
-                    .setMessage("Are you sure you want to delete this event type? (It can't be undone)")
-                    .setPositiveButton("Yes I am 100% sure", dialogClickListener)
-                    .setNegativeButton("No I want to keep this type", dialogClickListener)
+                    .setMessage(R.string.dialog_delete_event_type)
+                    .setTitle(R.string.title_delete_event_type)
+                    .setPositiveButton(R.string.delete_affirmative, dialogClickListener)
+                    .setNegativeButton(R.string.delete_negative, dialogClickListener)
                     .show();
         }
         return super.onOptionsItemSelected(item);

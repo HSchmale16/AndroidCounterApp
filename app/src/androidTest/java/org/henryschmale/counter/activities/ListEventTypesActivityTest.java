@@ -34,12 +34,15 @@ import static androidx.test.espresso.action.ViewActions.longClick;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.core.internal.deps.guava.base.Preconditions.checkNotNull;
+import static androidx.test.espresso.matcher.RootMatchers.isDialog;
 import static androidx.test.espresso.matcher.ViewMatchers.hasChildCount;
 import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withChild;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.anything;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.*;
 
 
@@ -48,17 +51,15 @@ import static org.junit.Assert.*;
 public class ListEventTypesActivityTest {
 
     @Test
-    public void doE2E() {
+    public void testCreateAndIncrDecr() {
         try (ActivityScenario<ListEventTypesActivity> scenario = ActivityScenario.launch(ListEventTypesActivity.class)) {
-            String faker = "Terrible" + System.currentTimeMillis();
+            String faker = "test create and increment" + System.currentTimeMillis();
 
             createEventType(faker, "");
 
             IdlingPolicies.setMasterPolicyTimeout(800, TimeUnit.MILLISECONDS);
 
-            openActionBarOverflowOrOptionsMenu(InstrumentationRegistry.getInstrumentation().getTargetContext());
-
-            onView(withText(R.string.most_recently_created)).perform(click());
+            sortNewestFirst();
 
             onView(withId(R.id.event_type_list))
                     .perform(RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.btn_increment)))
@@ -87,7 +88,86 @@ public class ListEventTypesActivityTest {
 
             onView(withId(R.id.event_type_list)).check(matches(atPosition(0, hasDescendant(withText("4")))));
 
+            onView(withId(R.id.event_type_list))
+                    .perform(RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.btn_increment)))
+                    .perform(RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.btn_increment)));
+
+            sortNewestFirst();
+
+            onView(withId(R.id.event_type_list)).check(matches(atPosition(0, hasDescendant(withText("6")))));
+
+            onView(withId(R.id.event_type_list))
+                    .perform(RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.btn_increment)))
+                    .perform(RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.btn_increment)))
+                    .perform(RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.btn_increment)));
+
+            sortNewestFirst();
+
+            onView(withId(R.id.event_type_list)).check(matches(atPosition(0, hasDescendant(withText("9")))));
+
+            // No op
+            onView(withId(R.id.event_type_list))
+                    .perform(RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.btn_increment)))
+                    .perform(RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.btn_decrement)));
+
+            sortNewestFirst();
+
+            onView(withId(R.id.event_type_list)).check(matches(atPosition(0, hasDescendant(withText("9")))));
         }
+    }
+
+    @Test
+    public void testDeleteEventType() {
+        try (ActivityScenario<ListEventTypesActivity> scenario = ActivityScenario.launch(ListEventTypesActivity.class)) {
+            String faker = "testDeleteEvent" + System.currentTimeMillis();
+
+            createEventType(faker, "This event type should be deleted when all is said and done");
+
+            sortNewestFirst();
+
+            onView(withId(R.id.event_type_list))
+                    .perform(RecyclerViewActions.actionOnItemAtPosition(0, longClick()));
+
+            onView(withId(R.id.menu_delete_event_type))
+                    .perform(click());
+
+            // check the alert dialog exists.
+            onView(withText(R.string.dialog_delete_event_type))
+                    .check(matches(isDisplayed()))
+                    .inRoot(isDialog());
+
+            // click negative on it.
+            onView(withText(R.string.delete_negative))
+                    .check(matches(isDisplayed()))
+                    .inRoot(isDialog())
+                    .perform(click());
+
+            // make sure the dialog is not present.
+            onView(not(withText(R.string.dialog_delete_event_type)));
+
+            // ensure we are still on the detail activity.
+            onView(not(withId(R.id.event_type_list)));
+
+            // Get the dialog back.
+            onView(withId(R.id.menu_delete_event_type))
+                    .perform(click());
+
+            onView(withText(R.string.delete_affirmative))
+                    .check(matches(isDisplayed()))
+                    .inRoot(isDialog())
+                    .perform(click());
+
+            // Ensure we are back on the event list activity.
+            sortNewestFirst();
+
+            onView(withId(R.id.event_type_list))
+                    .check(matches(atPosition(0, not(hasDescendant(withText(faker))))));
+        }
+    }
+
+    private void sortNewestFirst() {
+        openActionBarOverflowOrOptionsMenu(InstrumentationRegistry.getInstrumentation().getTargetContext());
+        onView(withText(R.string.most_recently_created)).perform(click());
     }
 
     private void createEventType(String name, String description) {

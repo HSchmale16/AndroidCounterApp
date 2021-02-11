@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/delete_event_type"
+        android:id="@+id/menu_delete_event_type"
         android:title="@string/delete_event_type"
         app:showAsAction="always"
         />

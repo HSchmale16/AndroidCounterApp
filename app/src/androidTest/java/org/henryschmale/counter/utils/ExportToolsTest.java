@@ -12,6 +12,7 @@ import org.henryschmale.counter.models.CountedEvent;
 import org.henryschmale.counter.models.CountedEventType;
 import org.henryschmale.counter.models.EventTypeWithVotes;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -76,7 +77,7 @@ public class ExportToolsTest {
 
     @Test
     public void testExportToolsForJson() {
-
+        Assert.fail("Not yet implemented");
     }
 
 }
