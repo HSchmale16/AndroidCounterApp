@@ -57,7 +57,7 @@ public class ListEventTypesActivityTest {
 
             createEventType(faker, "");
 
-            IdlingPolicies.setMasterPolicyTimeout(800, TimeUnit.MILLISECONDS);
+            IdlingPolicies.setMasterPolicyTimeout(2000, TimeUnit.MILLISECONDS);
 
             sortNewestFirst();
 

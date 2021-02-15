@@ -1,6 +1,7 @@
 package org.henryschmale.counter.models;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Embedded;
 import androidx.room.Entity;
@@ -14,7 +15,7 @@ import org.henryschmale.counter.utils.DateConverter;
 import java.time.OffsetDateTime;
 
 /**
- * Contains a counted event or counter that we are counting up occurances of
+ * Contains a counted event or counter that we are counting up occurrences of
  */
 @Entity(indices = {
         @Index(value = {"event_type_name"}, unique = true)
@@ -33,4 +34,6 @@ public class CountedEventType {
 
     public OffsetDateTime createdAt = OffsetDateTime.now();
 
+    @ColumnInfo(name = "color", defaultValue = "0xFFFFFFFF")
+    public int color;
 }

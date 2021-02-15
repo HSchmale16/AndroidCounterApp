@@ -9,6 +9,8 @@
         android:roundIcon="@mipmap/app_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Counter">
+
+
         <activity
             android:name=".activities.EventDetailActivity"
             android:theme="@style/Theme.Counter.NoActionBar" />

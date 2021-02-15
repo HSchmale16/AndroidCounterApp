@@ -17,5 +17,10 @@
     </LinearLayout>
 
 
+    <ProgressBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/the_progress_bar"
+        android:visibility="invisible"/>
 
 </LinearLayout>

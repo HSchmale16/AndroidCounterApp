@@ -13,6 +13,7 @@ import org.henryschmale.counter.models.CountedEvent;
 import org.henryschmale.counter.models.CountedEventType;
 import org.henryschmale.counter.models.EventTypeDetail;
 import org.henryschmale.counter.models.EventTypeWithVotes;
+import org.henryschmale.counter.models.VoteEntryModel;
 
 import java.util.List;
 
@@ -65,4 +66,8 @@ public interface CountedEventTypeDao {
 
     @Delete()
     void deleteEventType(CountedEventType type);
+
+    @Query("SELECT COUNT(*) FROM CountedEvent")
+    int getTotalCountedVotes();
+
 }

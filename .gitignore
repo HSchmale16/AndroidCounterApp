@@ -2,7 +2,6 @@
 
 
 app/release
-app/schemas
 
 # Built application files
 *.apk
