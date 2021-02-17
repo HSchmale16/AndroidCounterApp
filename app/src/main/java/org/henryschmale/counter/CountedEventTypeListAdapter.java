@@ -1,10 +1,13 @@
 package org.henryschmale.counter;
 
+import android.media.Image;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.henryschmale.counter.models.CountedEvent;
 import org.henryschmale.counter.models.CountedEventType;
 import org.henryschmale.counter.models.EventTypeDetail;
+import org.henryschmale.counter.widgets.CountEventWidgetIntentService;
 
 import java.util.List;
 
@@ -78,7 +82,7 @@ public class CountedEventTypeListAdapter extends RecyclerView.Adapter<CountedEve
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.counted_event_type_incr_button_view, parent, false);
-        return new ViewHolder(view, dao);
+        return new ViewHolder(view);
     }
 
     @Override
@@ -100,20 +104,18 @@ public class CountedEventTypeListAdapter extends RecyclerView.Adapter<CountedEve
 
         private final TextView eventNameText;
         private final TextView counterText;
-        private final Button incrButton;
-        private final Button decrButton;
-        private final CountedEventTypeDao dao;
+        private final ImageButton incrButton;
+        private final ImageButton decrButton;
         private LiveData<EventTypeDetail> currentEventType;
         private int currentEventUid;
 
-        public ViewHolder(@NonNull View itemView, CountedEventTypeDao dao) {
+        public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             this.eventNameText = itemView.findViewById(R.id.event_type_name);
             this.counterText = itemView.findViewById(R.id.counter_text);
             this.incrButton = itemView.findViewById(R.id.btn_increment);
             this.decrButton = itemView.findViewById(R.id.btn_decrement);
-            this.dao = dao;
 
             this.incrButton.setOnClickListener(this);
             this.decrButton.setOnClickListener(this);
@@ -151,22 +153,19 @@ public class CountedEventTypeListAdapter extends RecyclerView.Adapter<CountedEve
         @Override
         public void onClick(View view) {
             if (view == this.incrButton) {
-                recordEvent((byte)1);
+                recordEvent("UP");
             } else if (view == this.decrButton) {
-                recordEvent((byte) -1);
+                recordEvent("DOWN");
             } else {
                 Log.w(TAG, "Click recorded for something that is not mine");
                 Log.w(TAG, view.toString());
             }
         }
 
-        private void recordEvent(byte direction) {
-            Log.d(TAG, Byte.toString(direction));
-            CountedEvent event = new CountedEvent();
-            event.countedEventTypeId = currentEventUid;
-            event.increment = direction;
-
-            this.dao.addCountedEvent(event);
+        private void recordEvent(String direction) {
+            CountEventWidgetIntentService.startActionIncrCount(
+                    owner.getApplicationContext(),
+                    Integer.toString(currentEventUid), direction);
         }
 
         @Override

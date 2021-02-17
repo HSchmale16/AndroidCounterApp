@@ -22,9 +22,22 @@
     <string name="delete_event_type">Delete Event Type</string>
     <string name="most_recently_created">Most Recently Created</string>
     <string name="dialog_delete_event_type">Are you sure you want to delete this event type? (It can\'t be undone)</string>
-    <string name="delete_affirmative">Yes I am 100% sure</string>
+    <string name="delete_affirmative">Yes I am 100%% sure</string>
     <string name="delete_negative">No I want to keep this type</string>
     <string name="title_delete_event_type">Delete Event Type?</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="title_activity_set_tracked_event_type_for_widget">
+        SetTrackedEventTypeForWidgetActivity
+    </string>
+    <!--
+    This string is used for square devices and overridden by hello_world in
+    values-round/strings.xml for round devices.
+    -->
+    <string name="hello_world">Hello Square World!</string>
+    <string name="example_event_type">Example Event Type</string>
+    <string name="track">Track</string>
+    <string name="widget_big_time_error">ERROR BIG TIME</string>
 
 
 </resources>

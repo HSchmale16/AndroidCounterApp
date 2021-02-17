@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.henryschmale.counter">
 
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <uses-feature android:name="android.hardware.type.watch" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/app_icon"
@@ -11,6 +15,30 @@
         android:theme="@style/Theme.Counter">
 
 
+        <activity android:name=".activities.SetTrackedEventTypeActivity">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
+            </intent-filter>
+
+        </activity>
+
+        <service
+            android:name=".widgets.CountEventWidgetIntentService"
+            android:exported="false" />
+
+        <!--
+            The widget that allows counting up events from your home screen.
+        -->
+        <receiver android:name=".widgets.IncrDecrTypeWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/incr_decr_type_widget_info" />
+        </receiver>
+
         <activity
             android:name=".activities.EventDetailActivity"
             android:theme="@style/Theme.Counter.NoActionBar" />
@@ -19,9 +47,9 @@
         <activity
             android:name=".activities.ListEventTypesActivity"
             android:theme="@style/Theme.Counter.NoActionBar">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

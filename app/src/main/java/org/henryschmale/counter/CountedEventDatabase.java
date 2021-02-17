@@ -1,6 +1,7 @@
 package org.henryschmale.counter;
 
 import android.content.Context;
+import android.database.Cursor;
 
 import androidx.annotation.NonNull;
 import androidx.room.Database;
@@ -41,15 +42,35 @@ public abstract class CountedEventDatabase extends RoomDatabase {
                             MIGRATION_7_8,
                             MIGRATION_8_9
                     )
+                    .addCallback(databaseSeeder)
                     .allowMainThreadQueries()
                     .build();
         }
         return INSTANCE;
     }
 
+    static final RoomDatabase.Callback databaseSeeder = new RoomDatabase.Callback() {
+        @Override
+        public void onCreate(@NonNull SupportSQLiteDatabase db) {
+            super.onCreate(db);
+
+            db.execSQL("INSERT INTO CountedEventType(event_type_name, event_type_description, createdAt) VALUES (?, ?, ?)",
+                    new Object[]{"Example event type", "This is an example event type. Use the increment buttons on the main screen to count up things related to it", OffsetDateTime.now().toString()});
+
+            db.execSQL("INSERT INTO CountedEventType(event_type_name, event_type_description, createdAt) VALUES (?, ?, ?)",
+                    new Object[]{"Another example type", "This is an example event type. Use the increment buttons on the main screen to count up things related to it. Long press to delete me", OffsetDateTime.now().toString()});
+
+            db.execSQL("INSERT INTO CountedEventType(event_type_name, event_type_description, createdAt) VALUES (?, ?, ?)",
+                    new Object[]{"Zeta Event", "This is an example event type. Use the increment buttons on the main screen to count up things related to it. Long press to delete me", OffsetDateTime.now().toString()});
+
+        }
+    };
+
     static final Migration MIGRATION_7_8 = new Migration(7, 8) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
+            // it needs to be in this format in order to use a hex digit for it here and for room to not complain
+            //noinspection SyntaxError
             database.execSQL("ALTER TABLE CountedEventType ADD COLUMN color INTEGER NOT NULL DEFAULT 0xFFFFFFFF");
             database.execSQL("DROP VIEW IF EXISTS VoteEntryModel");
             database.execSQL("CREATE VIEW `VoteEntryModel` AS SELECT " +

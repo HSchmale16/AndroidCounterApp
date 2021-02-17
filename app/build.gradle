@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.application'
+    id 'kotlin-android'
 }
 
 android {
@@ -7,10 +8,10 @@ android {
 
     defaultConfig {
         applicationId "org.henryschmale.counter"
-        minSdkVersion 26
+        minSdkVersion 24
         targetSdkVersion 29
-        versionCode 4
-        versionName "0.4-alpha"
+        versionCode 6
+        versionName "0.6-alpha"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -38,11 +39,11 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.navigation:navigation-fragment:2.3.3'
-    implementation 'androidx.navigation:navigation-ui:2.3.3'
 
+    // GSON to generate the JSON files
     implementation 'com.google.code.gson:gson:2.8.5'
 
+    // ROOM ORM because it's amazing
     def room_version = "2.2.6"
 
     implementation "androidx.room:room-runtime:$room_version"

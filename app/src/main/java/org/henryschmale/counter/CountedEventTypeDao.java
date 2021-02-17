@@ -34,6 +34,9 @@ public interface CountedEventTypeDao {
     @Query("SELECT * FROM EventTypeDetail WHERE uid = :id")
     LiveData<EventTypeDetail> getEventDetailById(int id);
 
+    @Query("SELECT * FROM EventTypeDetail WHERE uid = :id")
+    EventTypeDetail getEventDetailByIdNOW(int id);
+
 
     // BEGIN ORDERING METHODS OF COUNTED EVENT TYPE
     @Query("SELECT * FROM CountedEventType ORDER BY CountedEventType.event_type_name ASC")
