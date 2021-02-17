@@ -18,7 +18,7 @@ import org.henryschmale.counter.models.VoteEntryModel;
 import java.time.OffsetDateTime;
 
 @Database(
-        version = 9,
+        version = 10,
         entities = {
                 CountedEventType.class,
                 CountedEvent.class
@@ -40,7 +40,8 @@ public abstract class CountedEventDatabase extends RoomDatabase {
                     CountedEventDatabase.class, "database-name")
                     .addMigrations(
                             MIGRATION_7_8,
-                            MIGRATION_8_9
+                            MIGRATION_8_9,
+                            MIGRATION_9_10
                     )
                     .addCallback(databaseSeeder)
                     .allowMainThreadQueries()
@@ -89,6 +90,13 @@ public abstract class CountedEventDatabase extends RoomDatabase {
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("INSERT INTO CountedEventType(event_type_name, event_type_description, createdAt) VALUES (?, ?, ?)",
                 new Object[]{"Example event type", "This is an example event type. Use the increment buttons on the main screen to count up things related to it", OffsetDateTime.now().toString()});
+        }
+    };
+
+    static final Migration MIGRATION_9_10 = new Migration(9, 10) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE CountedEvent ADD COLUMN source INTEGER;");
         }
     };
 }

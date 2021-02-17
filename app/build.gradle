@@ -1,6 +1,5 @@
 plugins {
     id 'com.android.application'
-    id 'kotlin-android'
 }
 
 android {
@@ -8,10 +7,10 @@ android {
 
     defaultConfig {
         applicationId "org.henryschmale.counter"
-        minSdkVersion 24
+        minSdkVersion 26
         targetSdkVersion 29
-        versionCode 6
-        versionName "0.6-alpha"
+        versionCode 9
+        versionName "0.9-alpha"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 

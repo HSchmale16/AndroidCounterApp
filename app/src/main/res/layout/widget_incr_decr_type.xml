@@ -12,10 +12,11 @@
     <TextView
         android:gravity="center"
         android:layout_centerHorizontal="true"
+        android:maxLines="1"
         android:id="@+id/event_type_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/title_delete_event_type" />
+        android:text="@string/example_event_type" />
 
     <LinearLayout
         android:id="@+id/buttonPanel"
@@ -55,6 +56,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/buttonPanel"
         android:layout_centerHorizontal="true"
-        android:text="500" />
+        tools:text="500" />
 
 </RelativeLayout>

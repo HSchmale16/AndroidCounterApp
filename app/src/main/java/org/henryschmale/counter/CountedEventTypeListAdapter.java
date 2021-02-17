@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.henryschmale.counter.models.CountedEvent;
 import org.henryschmale.counter.models.CountedEventType;
+import org.henryschmale.counter.models.EventSource;
 import org.henryschmale.counter.models.EventTypeDetail;
 import org.henryschmale.counter.widgets.CountEventWidgetIntentService;
 
@@ -165,7 +166,8 @@ public class CountedEventTypeListAdapter extends RecyclerView.Adapter<CountedEve
         private void recordEvent(String direction) {
             CountEventWidgetIntentService.startActionIncrCount(
                     owner.getApplicationContext(),
-                    Integer.toString(currentEventUid), direction);
+                    Integer.toString(currentEventUid), direction,
+                    EventSource.EVENT_LIST);
         }
 
         @Override

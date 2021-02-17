@@ -11,11 +11,13 @@ import android.widget.RemoteViews;
 
 import org.henryschmale.counter.CountedEventDatabase;
 import org.henryschmale.counter.R;
+import org.henryschmale.counter.models.EventSource;
 import org.henryschmale.counter.models.EventTypeDetail;
 
 import static org.henryschmale.counter.widgets.CountEventWidgetIntentService.ACTION_COUNT_EVENT_TYPE;
 import static org.henryschmale.counter.widgets.CountEventWidgetIntentService.EXTRA_DIRECTION;
 import static org.henryschmale.counter.widgets.CountEventWidgetIntentService.EXTRA_EVENT_TYPE_ID;
+import static org.henryschmale.counter.widgets.CountEventWidgetIntentService.EXTRA_SOURCE;
 
 /**
  * Implementation of App Widget functionality.
@@ -28,15 +30,31 @@ public class IncrDecrTypeWidget extends AppWidgetProvider {
 
         Log.d(TAG, "Creating " + direction + " intent for event id = " + eventTypeId);
 
-        Intent incrIntent = new Intent(context, CountEventWidgetIntentService.class);
+        Intent incrIntent = new Intent(context, IncrDecrTypeWidget.class);
         incrIntent.setAction(ACTION_COUNT_EVENT_TYPE);
         incrIntent.putExtra(EXTRA_EVENT_TYPE_ID, Integer.toString(eventTypeId));
         incrIntent.putExtra(EXTRA_DIRECTION, direction);
+        //incrIntent.putExtra(EXTRA_SOURCE, EventSource.WIDGET.getCode());
 
-        int requestCode = direction.equals("UP") ? 1 : -1;
-        requestCode *= eventTypeId;
+        int requestCode = (direction.equals("UP") ? 1 : -1) * eventTypeId;
 
-        return PendingIntent.getService(context, requestCode, incrIntent, PendingIntent.FLAG_ONE_SHOT);
+        return PendingIntent.getBroadcast(context, requestCode, incrIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        //return PendingIntent.getService(context, requestCode, incrIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        super.onReceive(context, intent);
+
+        if (intent.getAction().equals(ACTION_COUNT_EVENT_TYPE)) {
+            Log.d(TAG, "received count event inc");
+            intent.setClass(context, CountEventWidgetIntentService.class);
+            String eventTypeId = intent.getStringExtra(EXTRA_EVENT_TYPE_ID);
+            String direction = intent.getStringExtra(EXTRA_DIRECTION);
+
+            CountEventWidgetIntentService.startActionIncrCount(context, eventTypeId, direction, EventSource.WIDGET);
+
+        }
     }
 
     public static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId, int eventTypeId) {
@@ -75,6 +93,8 @@ public class IncrDecrTypeWidget extends AppWidgetProvider {
             updateAppWidget(context, appWidgetManager, appWidgetId, eventTypeId);
         }
     }
+
+
 
     @Override
     public void onEnabled(Context context) {

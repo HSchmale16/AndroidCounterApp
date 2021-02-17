@@ -1,5 +1,8 @@
 package org.henryschmale.counter.models;
 
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
@@ -13,6 +16,7 @@ import java.time.OffsetDateTime;
 /**
  * A count instance
  */
+@RequiresApi(api = Build.VERSION_CODES.O)
 @Entity(
         foreignKeys = {
                 @ForeignKey(
@@ -23,7 +27,7 @@ import java.time.OffsetDateTime;
                 )
         }
 )
-@TypeConverters(DateConverter.class)
+@TypeConverters({DateConverter.class, EventSource.class })
 public class CountedEvent {
     @PrimaryKey(autoGenerate = true)
     public long uid;
@@ -34,4 +38,6 @@ public class CountedEvent {
     public int countedEventTypeId;
 
     public byte increment;
+
+    public EventSource source;
 }

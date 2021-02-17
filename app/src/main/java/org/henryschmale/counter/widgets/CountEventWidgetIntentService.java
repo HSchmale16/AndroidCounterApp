@@ -7,8 +7,11 @@ import android.content.Intent;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.core.app.JobIntentService;
+
 import org.henryschmale.counter.CountedEventDatabase;
 import org.henryschmale.counter.models.CountedEvent;
+import org.henryschmale.counter.models.EventSource;
 import org.henryschmale.counter.models.EventTypeDetail;
 
 import java.time.OffsetDateTime;
@@ -20,8 +23,9 @@ import java.util.MissingResourceException;
  *
  * Allows pushing details about the
  */
-public class CountEventWidgetIntentService extends IntentService {
+public class CountEventWidgetIntentService extends JobIntentService {
     public static final String TAG = "EventWidgetService";
+    public static final int JOB_ID = 10001;
 
     // TODO: Rename actions, choose action names that describe tasks that this
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
@@ -33,7 +37,7 @@ public class CountEventWidgetIntentService extends IntentService {
     public static final String EXTRA_SOURCE = "org.henryschmale.widgets.extra.SOURCE";
 
     public CountEventWidgetIntentService() {
-        super("CountedEventWidgetIntentService");
+        super();
     }
 
     /**
@@ -43,22 +47,28 @@ public class CountEventWidgetIntentService extends IntentService {
      * @see IntentService
      */
     // TODO: Customize helper method
-    public static void startActionIncrCount(Context context, String eventTypeId, String direction) {
+    public static void startActionIncrCount(Context context, String eventTypeId, String direction, EventSource source) {
         Intent intent = new Intent(context, CountEventWidgetIntentService.class);
         intent.setAction(ACTION_COUNT_EVENT_TYPE);
         intent.putExtra(EXTRA_EVENT_TYPE_ID, eventTypeId);
         intent.putExtra(EXTRA_DIRECTION, direction);
-        context.startService(intent);
+        intent.putExtra(EXTRA_SOURCE, source.getCode());
+
+        enqueueWork(context, CountEventWidgetIntentService.class, JOB_ID, intent);
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
+    protected void onHandleWork(Intent intent) {
         if (intent != null) {
+            Log.d(TAG, intent.getAction());
             final String action = intent.getAction();
             if (ACTION_COUNT_EVENT_TYPE.equals(action)) {
                 final String param1 = intent.getStringExtra(EXTRA_EVENT_TYPE_ID);
                 final String param2 = intent.getStringExtra(EXTRA_DIRECTION);
-                handleActionCountIncr(param1, param2);
+                final int sourceCode = intent.getIntExtra(EXTRA_SOURCE, EventSource.UNKNOWN.getCode());
+                final EventSource source = EventSource.getSourceFromCode(sourceCode);
+
+                handleActionCountIncr(param1, param2, source);
             }
         }
     }
@@ -67,7 +77,7 @@ public class CountEventWidgetIntentService extends IntentService {
      * handles the action count incr. Requires strings for some reason. Mostly because I don't
      * fully understand how intents work yet.
      */
-    private void handleActionCountIncr(String eventTypeIdStr, String direction) {
+    private void handleActionCountIncr(String eventTypeIdStr, String direction, EventSource source) {
         assert eventTypeIdStr != null;
         assert direction != null;
 
@@ -85,6 +95,7 @@ public class CountEventWidgetIntentService extends IntentService {
         CountedEvent event = new CountedEvent();
 
         event.countedEventTypeId = eventTypeId;
+        event.source = source;
 
         if (direction.equals("UP")) {
             event.increment = 1;
