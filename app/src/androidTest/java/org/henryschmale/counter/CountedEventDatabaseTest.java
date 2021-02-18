@@ -68,6 +68,7 @@ public class CountedEventDatabaseTest {
     // Array of all migrations
     private static final Migration[] ALL_MIGRATIONS = new Migration[]{
             CountedEventDatabase.MIGRATION_7_8, CountedEventDatabase.MIGRATION_8_9,
-            CountedEventDatabase.MIGRATION_9_10
+            CountedEventDatabase.MIGRATION_9_10,
+            CountedEventDatabase.MIGRATION_10_11
     };
 }

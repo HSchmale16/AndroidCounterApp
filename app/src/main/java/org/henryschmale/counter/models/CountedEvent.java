@@ -1,5 +1,6 @@
 package org.henryschmale.counter.models;
 
+import android.location.Location;
 import android.os.Build;
 
 import androidx.annotation.RequiresApi;
@@ -10,6 +11,7 @@ import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
 import org.henryschmale.counter.utils.DateConverter;
+import org.henryschmale.counter.utils.LocationTypeConverter;
 
 import java.time.OffsetDateTime;
 
@@ -27,7 +29,7 @@ import java.time.OffsetDateTime;
                 )
         }
 )
-@TypeConverters({DateConverter.class, EventSource.class })
+@TypeConverters({DateConverter.class, EventSource.class})
 public class CountedEvent {
     @PrimaryKey(autoGenerate = true)
     public long uid;
@@ -40,4 +42,9 @@ public class CountedEvent {
     public byte increment;
 
     public EventSource source;
+
+    public Double latitude;
+    public Double longitude;
+    public Double altitude;
+    public Float accuracy;
 }

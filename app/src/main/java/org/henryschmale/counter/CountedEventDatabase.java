@@ -1,7 +1,6 @@
 package org.henryschmale.counter;
 
 import android.content.Context;
-import android.database.Cursor;
 
 import androidx.annotation.NonNull;
 import androidx.room.Database;
@@ -18,7 +17,7 @@ import org.henryschmale.counter.models.VoteEntryModel;
 import java.time.OffsetDateTime;
 
 @Database(
-        version = 10,
+        version = 12,
         entities = {
                 CountedEventType.class,
                 CountedEvent.class
@@ -41,7 +40,9 @@ public abstract class CountedEventDatabase extends RoomDatabase {
                     .addMigrations(
                             MIGRATION_7_8,
                             MIGRATION_8_9,
-                            MIGRATION_9_10
+                            MIGRATION_9_10,
+                            MIGRATION_10_11,
+                            MIGRATION_11_12
                     )
                     .addCallback(databaseSeeder)
                     .allowMainThreadQueries()
@@ -64,6 +65,23 @@ public abstract class CountedEventDatabase extends RoomDatabase {
             db.execSQL("INSERT INTO CountedEventType(event_type_name, event_type_description, createdAt) VALUES (?, ?, ?)",
                     new Object[]{"Zeta Event", "This is an example event type. Use the increment buttons on the main screen to count up things related to it. Long press to delete me", OffsetDateTime.now().toString()});
 
+        }
+    };
+
+    static final Migration MIGRATION_10_11 = new Migration(10, 11) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE CountedEvent ADD COLUMN last_location VARCHAR(200)");
+        }
+    };
+
+    static final Migration MIGRATION_11_12 = new Migration(11, 12) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE CountedEvent ADD COLUMN latitude DOUBLE");
+            database.execSQL("ALTER TABLE CountedEvent ADD COLUMN longitude DOUBLE");
+            database.execSQL("ALTER TABLE CountedEvent ADD COLUMN altitude DOUBLE");
+            database.execSQL("ALTER TABLE CountedEvent ADD COLUMN accuracy DOUBLE");
         }
     };
 
