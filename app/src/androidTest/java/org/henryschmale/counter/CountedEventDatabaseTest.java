@@ -46,29 +46,13 @@ public class CountedEventDatabaseTest {
         appDb.close();
     }
 
-    @Test
-    public void migrate_8_9_Add_A_Default_Example_Type() throws IOException, ExecutionException, InterruptedException {
-        SupportSQLiteDatabase db = helper.createDatabase(TEST_DB, 8);
-        db.close();
-
-        CountedEventDatabase appDb = Room.databaseBuilder(
-                InstrumentationRegistry.getInstrumentation().getTargetContext(),
-                CountedEventDatabase.class, TEST_DB)
-                .addMigrations(ALL_MIGRATIONS).build();
-        appDb.getOpenHelper().getWritableDatabase();
-
-        assertEquals(0, appDb.countedEventTypeDao().getTotalCountedVotes());
-
-        long totalEventTypes =  appDb.countedEventTypeDao().totalCount().get();
-        assertEquals(1, totalEventTypes);
-
-        appDb.close();
-    }
-
     // Array of all migrations
     private static final Migration[] ALL_MIGRATIONS = new Migration[]{
-            CountedEventDatabase.MIGRATION_7_8, CountedEventDatabase.MIGRATION_8_9,
+            CountedEventDatabase.MIGRATION_7_8,
+            CountedEventDatabase.MIGRATION_8_9,
             CountedEventDatabase.MIGRATION_9_10,
-            CountedEventDatabase.MIGRATION_10_11
+            CountedEventDatabase.MIGRATION_10_11,
+            CountedEventDatabase.MIGRATION_11_12,
+            CountedEventDatabase.MIGRATION_12_13
     };
 }

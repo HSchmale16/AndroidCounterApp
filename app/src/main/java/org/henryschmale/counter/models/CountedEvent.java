@@ -36,7 +36,6 @@ public class CountedEvent {
 
     public OffsetDateTime createdAt = OffsetDateTime.now();
 
-    @ColumnInfo(index = true)
     public int countedEventTypeId;
 
     public byte increment;

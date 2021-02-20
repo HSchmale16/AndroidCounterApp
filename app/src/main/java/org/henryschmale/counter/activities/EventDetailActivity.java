@@ -108,14 +108,11 @@ public class EventDetailActivity extends AppCompatActivity {
 
         CountedEventDatabase db = CountedEventDatabase.getInstance(getApplicationContext());
         LiveData<CountedEventType> eventType = db.countedEventTypeDao().getEventTypeById(targetEventTypeId);
-        eventType.observe(this, new Observer<CountedEventType>() {
-            @Override
-            public void onChanged(CountedEventType countedEventType) {
-                db.countedEventTypeDao().deleteEventType(countedEventType);
-                eventType.removeObservers(EventDetailActivity.this);
-                setResult(RESULT_OK);
-                finish();
-            }
+        eventType.observe(this, countedEventType -> {
+            db.countedEventTypeDao().deleteEventType(countedEventType);
+            eventType.removeObservers(EventDetailActivity.this);
+            setResult(RESULT_OK);
+            finish();
         });
     }
 }

@@ -6,4 +6,8 @@
         android:title="@string/delete_event_type"
         app:showAsAction="always"
         />
+
+    <item
+        android:id="@+id/menu_pin_widget"
+        android:title="Pin Widget" />
 </menu>

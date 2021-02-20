@@ -1,6 +1,7 @@
 package org.henryschmale.counter.activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -9,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.nfc.Tag;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Layout;
 import android.util.Log;
@@ -19,13 +21,18 @@ import android.widget.Button;
 import android.widget.RemoteViews;
 import android.widget.TextView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import org.henryschmale.counter.CountedEventDatabase;
 import org.henryschmale.counter.R;
 import org.henryschmale.counter.models.CountedEventType;
+import org.henryschmale.counter.models.CountedWidgetIdToEventType;
 import org.henryschmale.counter.widgets.IncrDecrTypeWidget;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.henryschmale.counter.activities.CreateEventTypeActivity.CREATE_EVENT_REQUEST_CODE;
 
 /**
  * Configuration activity for picking event to track when setting up a widget.
@@ -33,21 +40,14 @@ import java.util.List;
 public class SetTrackedEventTypeActivity extends AppCompatActivity {
     public static final String TAG = "SetTrackedEventTypeActivity";
     int appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
+    CountedEventDatabase database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_set_tracked_event_type);
 
-        getSupportActionBar().setTitle("Select Event Type For Widget To Track");
 
-        CountedEventDatabase database = CountedEventDatabase.getInstance(getApplicationContext());
-
-        RecyclerView view = findViewById(R.id.event_type_list);
-        EventTypeSelectListAdapter adapter = new EventTypeSelectListAdapter();
-
-        database.countedEventTypeDao().getEventTypesOrderByNameAsc().observe(this, adapter::setData);
-        view.setAdapter(adapter);
 
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
@@ -61,6 +61,31 @@ public class SetTrackedEventTypeActivity extends AppCompatActivity {
         if (appWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
             finish();
         }
+
+        getSupportActionBar().setTitle("Select Event Type For Widget To Track");
+
+        this.database = CountedEventDatabase.getInstance(getApplicationContext());
+
+        RecyclerView recyclerView = findViewById(R.id.event_type_list);
+        EventTypeSelectListAdapter adapter = new EventTypeSelectListAdapter();
+
+        database.countedEventTypeDao().getEventTypesOrderByNameAsc().observe(this, adapter::setData);
+        recyclerView.setAdapter(adapter);
+
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(view -> {
+            Intent fabIntent = new Intent(SetTrackedEventTypeActivity.this, CreateEventTypeActivity.class);
+            startActivityForResult(fabIntent, CREATE_EVENT_REQUEST_CODE);
+        });
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CREATE_EVENT_REQUEST_CODE && data != null) {
+            //eventTypeAdapter.notifyItemChanged(data.getIntExtra("newItemId", 50));
+        }
     }
 
     class EventTypeSelectListAdapter extends RecyclerView.Adapter<EventTypeSelectListAdapter.ViewHolder> {
@@ -70,7 +95,6 @@ public class SetTrackedEventTypeActivity extends AppCompatActivity {
             this.data = theData;
             this.notifyDataSetChanged();
         }
-
 
         @NonNull
         @Override
@@ -112,17 +136,19 @@ public class SetTrackedEventTypeActivity extends AppCompatActivity {
                 Context context = getApplicationContext();
                 Log.d(TAG, "Clicked button for " + eventTypeId);
 
-                SharedPreferences sharedPreferences = context.getSharedPreferences("counter_widget_settings", Context.MODE_PRIVATE);
-                sharedPreferences.edit().putInt("widget" + appWidgetId, eventTypeId).apply();
+                //SharedPreferences sharedPreferences = context.getSharedPreferences("counter_widget_settings", Context.MODE_PRIVATE);
+                //sharedPreferences.edit().putInt("widget" + appWidgetId, eventTypeId).apply();
+                AsyncTask.execute(() -> {
+                    database.widgetDao().insertAppWidget(new CountedWidgetIdToEventType(appWidgetId, eventTypeId));
 
+                    AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
+                    IncrDecrTypeWidget.updateAppWidget(context, appWidgetManager, appWidgetId, eventTypeId);
 
-                AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getApplicationContext());
-                IncrDecrTypeWidget.updateAppWidget(context, appWidgetManager, appWidgetId, eventTypeId);
-
-                Intent resultValue = new Intent();
-                resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-                setResult(RESULT_OK, resultValue);
-                finish();
+                    Intent resultValue = new Intent();
+                    resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+                    setResult(RESULT_OK, resultValue);
+                    finish();
+                });
             }
         }
     }

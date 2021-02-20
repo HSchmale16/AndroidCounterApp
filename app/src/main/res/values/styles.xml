@@ -1,3 +1,7 @@
 <resources>
-
+    <style name="MainTheme" parent="Theme.AppCompat">
+        <item name="android:typeface">normal</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColorPrimary">@color/white</item>
+    </style>
 </resources>

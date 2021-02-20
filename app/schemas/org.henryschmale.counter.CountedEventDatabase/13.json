@@ -1,0 +1,204 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 13,
+    "identityHash": "f84ca34a76f2388cb8509abdd3b080ed",
+    "entities": [
+      {
+        "tableName": "CountedEventType",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `event_type_name` TEXT NOT NULL, `event_type_description` TEXT, `createdAt` TEXT, `color` INTEGER NOT NULL DEFAULT 0xFFFFFFFF)",
+        "fields": [
+          {
+            "fieldPath": "uid",
+            "columnName": "uid",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eventTypeName",
+            "columnName": "event_type_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eventTypeDescription",
+            "columnName": "event_type_description",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "color",
+            "columnName": "color",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0xFFFFFFFF"
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "uid"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_CountedEventType_event_type_name",
+            "unique": true,
+            "columnNames": [
+              "event_type_name"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_CountedEventType_event_type_name` ON `${TABLE_NAME}` (`event_type_name`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "CountedEvent",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `createdAt` TEXT, `countedEventTypeId` INTEGER NOT NULL, `increment` INTEGER NOT NULL, `source` INTEGER, `latitude` REAL, `longitude` REAL, `altitude` REAL, `accuracy` REAL, FOREIGN KEY(`countedEventTypeId`) REFERENCES `CountedEventType`(`uid`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "uid",
+            "columnName": "uid",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "countedEventTypeId",
+            "columnName": "countedEventTypeId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "increment",
+            "columnName": "increment",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "source",
+            "columnName": "source",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "latitude",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "longitude",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "altitude",
+            "columnName": "altitude",
+            "affinity": "REAL",
+            "notNull": false
+          },
+          {
+            "fieldPath": "accuracy",
+            "columnName": "accuracy",
+            "affinity": "REAL",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "uid"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "CountedEventType",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "countedEventTypeId"
+            ],
+            "referencedColumns": [
+              "uid"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "widget_id_event_type",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`app_widget_id` INTEGER NOT NULL, `eventTypeId` INTEGER NOT NULL, PRIMARY KEY(`app_widget_id`), FOREIGN KEY(`eventTypeId`) REFERENCES `CountedEventType`(`uid`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "appWidgetId",
+            "columnName": "app_widget_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eventTypeId",
+            "columnName": "eventTypeId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "app_widget_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_widget_id_event_type_eventTypeId",
+            "unique": false,
+            "columnNames": [
+              "eventTypeId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_widget_id_event_type_eventTypeId` ON `${TABLE_NAME}` (`eventTypeId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "CountedEventType",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "eventTypeId"
+            ],
+            "referencedColumns": [
+              "uid"
+            ]
+          }
+        ]
+      }
+    ],
+    "views": [
+      {
+        "viewName": "EventTypeDetail",
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT event_type_name as eventTypeName, CountedEventType.uid, CountedEventType.event_type_description as description, CountedEventType.createdAt as eventTypeCreated, SUM(CountedEvent.increment) as netScore, COUNT(*) as voteCount, MAX(CountedEvent.createdAt) as lastUpdated, SUM(CASE increment WHEN 1 THEN 1 ELSE 0 END) as incrementCount, SUM(CASE increment WHEN -1 THEN 1 ELSE 0 END) as decrementCount  FROM CountedEventType LEFT JOIN CountedEvent ON CountedEvent.countedEventTypeId = CountedEventType.uid GROUP BY CountedEventType.uid"
+      },
+      {
+        "viewName": "VoteEntryModel",
+        "createSql": "CREATE VIEW `${VIEW_NAME}` AS SELECT CountedEventType.uid , CountedEventType.event_type_name as eventTypeName , CountedEventType.createdAt as typeCreatedAt, CountedEvent.createdAt as votedOn, CountedEvent.increment  FROM CountedEventType INNER JOIN CountedEvent ON CountedEvent.countedEventTypeId = CountedEventType.uid"
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f84ca34a76f2388cb8509abdd3b080ed')"
+    ]
+  }
+}

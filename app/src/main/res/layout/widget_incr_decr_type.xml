@@ -2,7 +2,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="?attr/appWidgetBackgroundColor"
+    android:background="@drawable/roundcorner"
     android:layout_centerVertical="true"
     android:layout_gravity="center_vertical"
     android:layout_centerHorizontal="true"
@@ -28,6 +28,7 @@
 
         <ImageButton
             android:id="@+id/btn_decrement"
+            android:contentDescription="@string/increment_counter"
             style="?android:buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -37,13 +38,13 @@
 
         <ImageButton
             android:id="@+id/btn_increment"
+            android:contentDescription="@string/decrement_counter"
             style="?android:buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:background="@drawable/roundcorner"
             android:backgroundTint="@color/up_vote_color"
-
             android:src="@drawable/ic_baseline_add_circle_outline_24" />
 
     </LinearLayout>

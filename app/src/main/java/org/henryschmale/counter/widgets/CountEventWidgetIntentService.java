@@ -12,6 +12,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.JobIntentService;
 
@@ -19,6 +20,7 @@ import org.henryschmale.counter.CountedEventDatabase;
 import org.henryschmale.counter.models.CountedEvent;
 import org.henryschmale.counter.models.EventSource;
 import org.henryschmale.counter.models.EventTypeDetail;
+import org.henryschmale.counter.utils.DateConverter;
 
 import java.time.OffsetDateTime;
 import java.util.MissingResourceException;
@@ -40,7 +42,9 @@ public class CountEventWidgetIntentService extends JobIntentService {
     // TODO: Rename parameters
     public static final String EXTRA_EVENT_TYPE_ID = "org.henryschmale.counter.widgets.extra.PARAM_EVENT_TYPE_ID";
     public static final String EXTRA_DIRECTION = "org.henryschmale.counter.widgets.extra.INCR_DIRECTION";
-    public static final String EXTRA_SOURCE = "org.henryschmale.widgets.extra.SOURCE";
+    public static final String EXTRA_SOURCE = "org.henryschmale.counter.widgets.extra.SOURCE";
+    public static final String EXTRA_OFFSET_DATE_TIME = "org.henryschmale.counter.widgets.extra.OFFSET_DATE_TIME";
+    public static final String EXTRA_TRIGGER_WIDGET_UPDATE = "org.henryschmale.counter.widgets.extra.TRIGGER_WIDGET_UPDATE";
 
     public CountEventWidgetIntentService() {
         super();
@@ -64,18 +68,20 @@ public class CountEventWidgetIntentService extends JobIntentService {
     }
 
     @Override
-    protected void onHandleWork(Intent intent) {
-        if (intent != null) {
-            Log.d(TAG, intent.getAction());
-            final String action = intent.getAction();
-            if (ACTION_COUNT_EVENT_TYPE.equals(action)) {
-                final String param1 = intent.getStringExtra(EXTRA_EVENT_TYPE_ID);
-                final String param2 = intent.getStringExtra(EXTRA_DIRECTION);
-                final int sourceCode = intent.getIntExtra(EXTRA_SOURCE, EventSource.UNKNOWN.getCode());
-                final EventSource source = EventSource.getSourceFromCode(sourceCode);
+    protected void onHandleWork(@NonNull Intent intent) {
+        Log.d(TAG, intent.getAction());
+        final String action = intent.getAction();
+        if (ACTION_COUNT_EVENT_TYPE.equals(action)) {
+            final String eventTypeId = intent.getStringExtra(EXTRA_EVENT_TYPE_ID);
+            final String direction = intent.getStringExtra(EXTRA_DIRECTION);
 
-                handleActionCountIncr(param1, param2, source);
-            }
+            final int sourceCode = intent.getIntExtra(EXTRA_SOURCE, EventSource.UNKNOWN.getCode());
+            final EventSource source = EventSource.getSourceFromCode(sourceCode);
+
+            final String offsetDateTime = intent.getStringExtra(EXTRA_OFFSET_DATE_TIME);
+            OffsetDateTime dt = DateConverter.toOffsetDateTime(offsetDateTime);
+
+            handleActionCountIncr(eventTypeId, direction, source, dt);
         }
     }
 
@@ -83,7 +89,7 @@ public class CountEventWidgetIntentService extends JobIntentService {
      * handles the action count incr. Requires strings for some reason. Mostly because I don't
      * fully understand how intents work yet.
      */
-    private void handleActionCountIncr(String eventTypeIdStr, String direction, EventSource source) {
+    private void handleActionCountIncr(String eventTypeIdStr, String direction, EventSource source, OffsetDateTime timestamp) {
         assert eventTypeIdStr != null;
         assert direction != null;
 
@@ -111,7 +117,7 @@ public class CountEventWidgetIntentService extends JobIntentService {
             throw new UnsupportedOperationException("Must either UP or DOWN");
         }
 
-        event.createdAt = OffsetDateTime.now();
+        event.createdAt = timestamp == null ? OffsetDateTime.now() : timestamp;
 
         LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&

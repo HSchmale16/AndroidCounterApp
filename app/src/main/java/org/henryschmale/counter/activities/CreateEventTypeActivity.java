@@ -3,6 +3,7 @@ package org.henryschmale.counter.activities;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -22,11 +23,15 @@ import java.util.concurrent.ExecutionException;
 
 public class CreateEventTypeActivity extends AppCompatActivity {
     public static final String TAG = "CreateEventTypeActivity";
+    public static final int CREATE_EVENT_REQUEST_CODE = 1;
+
 
     Button submitButton;
     EditText nameField;
     EditText descriptionField;
     CountedEventTypeDao dao;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,13 +82,14 @@ public class CreateEventTypeActivity extends AppCompatActivity {
 
                 Log.d(TAG, cet.eventTypeName);
 
-                long id = dao.addCountedEventType(cet);
-                Intent intent = new Intent();
-                intent.putExtra("newItemId", id);
+                AsyncTask.execute(() -> {
+                    long id = dao.addCountedEventType(cet);
+                    Intent intent = new Intent();
+                    intent.putExtra("newItemId", id);
 
-
-                setResult(RESULT_OK, intent);
-                finish();
+                    setResult(RESULT_OK, intent);
+                    finish();
+                });
             }
         });
     }

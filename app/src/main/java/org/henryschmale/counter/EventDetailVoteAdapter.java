@@ -78,8 +78,6 @@ public class EventDetailVoteAdapter extends RecyclerView.Adapter<EventDetailVote
         }
 
         void setup(CountedEvent event) {
-            Log.d(TAG, event.toString());
-
             if (event.increment > 0) {
                 indicator.setBackgroundColor(upvoteColor);
             } else {

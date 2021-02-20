@@ -6,13 +6,22 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import com.google.common.util.concurrent.ListenableFuture;
+
 import org.henryschmale.counter.CountedEventDatabase;
 import org.henryschmale.counter.R;
+import org.henryschmale.counter.models.CountedEvent;
+import org.henryschmale.counter.models.CountedWidgetIdToEventType;
 import org.henryschmale.counter.models.EventSource;
 import org.henryschmale.counter.models.EventTypeDetail;
+import org.henryschmale.counter.models.EventTypeDetailsWithWidget;
+import org.henryschmale.counter.models.dao.WidgetDao;
+
+import java.util.List;
 
 import static org.henryschmale.counter.widgets.CountEventWidgetIntentService.ACTION_COUNT_EVENT_TYPE;
 import static org.henryschmale.counter.widgets.CountEventWidgetIntentService.EXTRA_DIRECTION;
@@ -24,6 +33,30 @@ import static org.henryschmale.counter.widgets.CountEventWidgetIntentService.EXT
  */
 public class IncrDecrTypeWidget extends AppWidgetProvider {
     public static final String TAG = "IncrDecrTypeWidget";
+    public static final String EXTRA_APP_WIDGET_ID = "org.henryschmale.counter.widgets.extra.APP_WIDGET_ID";
+    public static final String EXTRA_CURRENT_COUNT = "org.henryschmale.counter.widgets.extra.CURRENT_COUNT";
+
+    /**
+     * We have to proxy button presses using a broadcast to ensure our app receives them
+     * to pass on to the application
+     *
+     * @param context
+     * @param intent
+     */
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        super.onReceive(context, intent);
+
+        if (intent.getAction().equals(ACTION_COUNT_EVENT_TYPE)) {
+            Log.d(TAG, "received count event inc");
+            intent.setClass(context, CountEventWidgetIntentService.class);
+            String eventTypeId = intent.getStringExtra(EXTRA_EVENT_TYPE_ID);
+            String direction = intent.getStringExtra(EXTRA_DIRECTION);
+
+            CountEventWidgetIntentService.startActionIncrCount(context, eventTypeId, direction, EventSource.WIDGET);
+        }
+    }
+
 
     private static PendingIntent getIntentForIncr(Context context, String direction, int eventTypeId) {
         String id = Integer.toString(eventTypeId);
@@ -39,29 +72,13 @@ public class IncrDecrTypeWidget extends AppWidgetProvider {
         int requestCode = (direction.equals("UP") ? 1 : -1) * eventTypeId;
 
         return PendingIntent.getBroadcast(context, requestCode, incrIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        //return PendingIntent.getService(context, requestCode, incrIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-    }
-
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        super.onReceive(context, intent);
-
-        if (intent.getAction().equals(ACTION_COUNT_EVENT_TYPE)) {
-            Log.d(TAG, "received count event inc");
-            intent.setClass(context, CountEventWidgetIntentService.class);
-            String eventTypeId = intent.getStringExtra(EXTRA_EVENT_TYPE_ID);
-            String direction = intent.getStringExtra(EXTRA_DIRECTION);
-
-            CountEventWidgetIntentService.startActionIncrCount(context, eventTypeId, direction, EventSource.WIDGET);
-
-        }
     }
 
     public static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId, int eventTypeId) {
         // Construct the RemoteViews object
         CountedEventDatabase db = CountedEventDatabase.getInstance(context);
 
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_incr_decr_type);
+        RemoteViews views = getRemoteViews(context, 0, "");
 
         EventTypeDetail x = db.countedEventTypeDao().getEventDetailByIdNOW(eventTypeId);
 
@@ -84,14 +101,40 @@ public class IncrDecrTypeWidget extends AppWidgetProvider {
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
+
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         // There may be multiple widgets active, so update all of them
-        SharedPreferences sharedPreferences = context.getSharedPreferences("counter_widget_settings", Context.MODE_PRIVATE);
-        for (int appWidgetId : appWidgetIds) {
-            int eventTypeId = sharedPreferences.getInt("widget" + appWidgetId, -1);
-            updateAppWidget(context, appWidgetManager, appWidgetId, eventTypeId);
-        }
+
+
+        AsyncTask.execute(
+                () -> {
+                    CountedEventDatabase db = CountedEventDatabase.getInstance(context);
+                    WidgetDao dao = db.widgetDao();
+                    List<CountedWidgetIdToEventType> widgets = dao.getEventsForAppIds(appWidgetIds);
+
+                    for (CountedWidgetIdToEventType widget : widgets) {
+                        updateAppWidget(context, appWidgetManager, widget.appWidgetId, widget.eventTypeId);
+                    }
+
+                }
+        );
+
+
+//        widgetIdToEventTypes.addListener((x) -> {
+//            for (CountedWidgetIdToEventType widget : widgetIdToEventTypes.get()) {
+//                updateAppWidget(context, appWidgetManager, widget.appWidgetId, widget.eventTypeId);
+//            }
+//        }, Runnable::run);
+    }
+
+    private static RemoteViews getRemoteViews(Context context, long count, String eventName) {
+        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_incr_decr_type);
+
+        views.setTextViewText(R.id.event_type_name, eventName);
+        views.setTextViewText(R.id.event_type_count, Long.toString(count));
+
+        return views;
     }
 
 
@@ -110,28 +153,18 @@ public class IncrDecrTypeWidget extends AppWidgetProvider {
     @Override
     public void onRestored(Context context, int[] oldWidgetIds, int[] newWidgetIds) {
         super.onRestored(context, oldWidgetIds, newWidgetIds);
+        CountedEventDatabase db = CountedEventDatabase.getInstance(context);
 
-        SharedPreferences sharedPreferences = context.getSharedPreferences("counter_widget_settings", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        for (int i = 0; i < oldWidgetIds.length; ++i) {
-            int eventTypeId = sharedPreferences.getInt("widget"+oldWidgetIds[i], -1);
-            editor.remove("widget"+oldWidgetIds[i]);
-
-            editor.putInt("widget"+newWidgetIds[i], eventTypeId);
-        }
-        editor.apply();
+        db.widgetDao().updateAppWidgetIds(oldWidgetIds, newWidgetIds);
     }
 
     @Override
     public void onDeleted(Context context, int[] appWidgetIds) {
         super.onDeleted(context, appWidgetIds);
-        SharedPreferences sharedPreferences = context.getSharedPreferences("counter_widget_settings", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        for (int appWidgetId : appWidgetIds) {
-            editor.remove("widget" + appWidgetId);
-        }
-        editor.apply();
+        CountedEventDatabase db = CountedEventDatabase.getInstance(context);
+
+        db.widgetDao().deleteAppWidgets(appWidgetIds);
+
     }
 
     @Override

@@ -38,6 +38,8 @@
     <string name="example_event_type">Example Event Type</string>
     <string name="track">Track</string>
     <string name="widget_big_time_error">ERROR BIG TIME</string>
+    <string name="increment_counter">Increment Counter</string>
+    <string name="decrement_counter">Decrement Counter</string>
 
 
 </resources>

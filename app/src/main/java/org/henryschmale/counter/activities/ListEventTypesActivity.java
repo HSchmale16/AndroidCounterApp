@@ -28,10 +28,10 @@ import static org.henryschmale.counter.CountedEventTypeListAdapter.SortOrder.BY_
 import static org.henryschmale.counter.CountedEventTypeListAdapter.SortOrder.BY_NAME_Z_A;
 import static org.henryschmale.counter.CountedEventTypeListAdapter.SortOrder.NEWEST_CREATED;
 import static org.henryschmale.counter.CountedEventTypeListAdapter.SortOrder.OLDEST_CREATED;
+import static org.henryschmale.counter.activities.CreateEventTypeActivity.CREATE_EVENT_REQUEST_CODE;
 
 public class ListEventTypesActivity extends AppCompatActivity implements LongClickRecyclerHandler {
     public static final String TAG = "ListEventTypesActivity";
-    public static final int CREATE_EVENT_REQUEST_CODE = 1;
     public static final int EXPORT_REQUEST_CODE = 2;
     public static final int EVENT_DETAIL_REQUEST_CODE = 3;
     CountedEventTypeListAdapter eventTypeAdapter;

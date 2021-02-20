@@ -13,14 +13,17 @@ import org.henryschmale.counter.models.CountedEvent;
 import org.henryschmale.counter.models.CountedEventType;
 import org.henryschmale.counter.models.EventTypeDetail;
 import org.henryschmale.counter.models.VoteEntryModel;
+import org.henryschmale.counter.models.CountedWidgetIdToEventType;
+import org.henryschmale.counter.models.dao.WidgetDao;
 
 import java.time.OffsetDateTime;
 
 @Database(
-        version = 12,
+        version = 13,
         entities = {
                 CountedEventType.class,
-                CountedEvent.class
+                CountedEvent.class,
+                CountedWidgetIdToEventType.class
         },
         views = {
                 EventTypeDetail.class,
@@ -33,19 +36,22 @@ public abstract class CountedEventDatabase extends RoomDatabase {
 
     public abstract CountedEventTypeDao countedEventTypeDao();
 
-    public static CountedEventDatabase getInstance(final Context context) {
+    public abstract WidgetDao widgetDao();
+
+    public static synchronized CountedEventDatabase getInstance(final Context context) {
         if (INSTANCE == null) {
-            INSTANCE = Room.databaseBuilder(context,
-                    CountedEventDatabase.class, "database-name")
+            INSTANCE = Room.databaseBuilder(context, CountedEventDatabase.class, "database-name")
                     .addMigrations(
                             MIGRATION_7_8,
                             MIGRATION_8_9,
                             MIGRATION_9_10,
                             MIGRATION_10_11,
-                            MIGRATION_11_12
+                            MIGRATION_11_12,
+                            MIGRATION_12_13
                     )
+                    .fallbackToDestructiveMigration()
                     .addCallback(databaseSeeder)
-                    .allowMainThreadQueries()
+                    //.allowMainThreadQueries()
                     .build();
         }
         return INSTANCE;
@@ -64,7 +70,42 @@ public abstract class CountedEventDatabase extends RoomDatabase {
 
             db.execSQL("INSERT INTO CountedEventType(event_type_name, event_type_description, createdAt) VALUES (?, ?, ?)",
                     new Object[]{"Zeta Event", "This is an example event type. Use the increment buttons on the main screen to count up things related to it. Long press to delete me", OffsetDateTime.now().toString()});
+        }
+    };
 
+    static final Migration MIGRATION_12_13 = new Migration(12, 13) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL(
+                    "CREATE TABLE widget_id_event_type(" +
+                            "`app_widget_id` INTEGER PRIMARY KEY NOT NULL, " +
+                            "`eventTypeId` INTEGER NOT NULL, " +
+                            "FOREIGN KEY (`eventTypeId`) REFERENCES CountedEventType(`uid`) ON UPDATE NO ACTION ON DELETE CASCADE" +
+                            ")");
+            database.execSQL("CREATE INDEX IF NOT EXISTS index_widget_id_event_type_eventTypeId ON widget_id_event_type(eventTypeId)");
+        }
+    };
+
+    static final Migration MIGRATION_11_12 = new Migration(11, 12) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            // drop last location column
+            database.execSQL("CREATE TABLE `CountedEvent_new` (" +
+                    "`uid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`createdAt` TEXT, " +
+                    "`countedEventTypeId` INTEGER NOT NULL, " +
+                    "`increment` INTEGER NOT NULL," +
+                    " `source` INTEGER,  " +
+                    "FOREIGN KEY(`countedEventTypeId`) REFERENCES `CountedEventType`(`uid`) ON UPDATE NO ACTION ON DELETE CASCADE )");
+            database.execSQL("INSERT INTO CountedEvent_new(uid, createdAt, countedEventTypeId, increment, source) SELECT uid, createdAt, countedEventTypeId, increment, source FROM CountedEvent");
+            database.execSQL("DROP TABLE CountedEvent");
+            database.execSQL("ALTER TABLE CountedEvent_new RENAME TO CountedEvent");
+
+
+            database.execSQL("ALTER TABLE CountedEvent ADD COLUMN latitude REAL");
+            database.execSQL("ALTER TABLE CountedEvent ADD COLUMN longitude REAL");
+            database.execSQL("ALTER TABLE CountedEvent ADD COLUMN altitude REAL");
+            database.execSQL("ALTER TABLE CountedEvent ADD COLUMN accuracy REAL");
         }
     };
 
@@ -72,16 +113,6 @@ public abstract class CountedEventDatabase extends RoomDatabase {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("ALTER TABLE CountedEvent ADD COLUMN last_location VARCHAR(200)");
-        }
-    };
-
-    static final Migration MIGRATION_11_12 = new Migration(11, 12) {
-        @Override
-        public void migrate(@NonNull SupportSQLiteDatabase database) {
-            database.execSQL("ALTER TABLE CountedEvent ADD COLUMN latitude DOUBLE");
-            database.execSQL("ALTER TABLE CountedEvent ADD COLUMN longitude DOUBLE");
-            database.execSQL("ALTER TABLE CountedEvent ADD COLUMN altitude DOUBLE");
-            database.execSQL("ALTER TABLE CountedEvent ADD COLUMN accuracy DOUBLE");
         }
     };
 
