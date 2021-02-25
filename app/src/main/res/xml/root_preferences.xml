@@ -1,0 +1,66 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="Location Collection">
+        <SwitchPreference
+            app:key="enableLocationCollection"
+            app:title="Enable Location Collection"
+            app:summaryOn="Collect location data for export. Will include non-zero latitude and longitude in export"
+            app:summaryOff="Locations will not be collected for export."
+            />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="Export Options">
+
+        <SwitchPreference
+            app:key="includeExtraIdentifier"
+            app:title="Enable Extra Identifier for Export"/>
+
+        <EditTextPreference
+            app:dependency="includeExtraIdentifier"
+            app:key="extraIdentifier1"
+            app:summary="@string/extra_id_text_description"
+            app:title="Extra Identifier 1" />
+
+        <ListPreference
+            app:key="exportFormat"
+            app:title="Export Format"
+            app:defaultValue="JSON"
+            app:useSimpleSummaryProvider="true"
+            app:entryValues="@array/export_formats_values"
+            app:entries="@array/export_formats_entries"/>
+    </PreferenceCategory>
+
+    <!--
+    <PreferenceCategory app:title="@string/messages_header">
+
+        <EditTextPreference
+            app:key="signature"
+            app:title="@string/signature_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="reply"
+            app:entries="@array/reply_entries"
+            app:entryValues="@array/reply_values"
+            app:key="reply"
+            app:title="@string/reply_title"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/sync_header">
+
+        <SwitchPreferenceCompat
+            app:key="sync"
+            app:title="@string/sync_title" />
+
+        <SwitchPreferenceCompat
+            app:dependency="sync"
+            app:key="attachment"
+            app:summaryOff="@string/attachment_summary_off"
+            app:summaryOn="@string/attachment_summary_on"
+            app:title="@string/attachment_title" />
+
+    </PreferenceCategory>
+    -->
+</PreferenceScreen>

@@ -58,7 +58,7 @@ public class IncrDecrTypeWidget extends AppWidgetProvider {
     }
 
 
-    private static PendingIntent getIntentForIncr(Context context, String direction, int eventTypeId) {
+    private static PendingIntent getIntentForIncr(Context context, String direction, int eventTypeId, long currentCount) {
         String id = Integer.toString(eventTypeId);
 
         Log.d(TAG, "Creating " + direction + " intent for event id = " + eventTypeId);
@@ -67,7 +67,7 @@ public class IncrDecrTypeWidget extends AppWidgetProvider {
         incrIntent.setAction(ACTION_COUNT_EVENT_TYPE);
         incrIntent.putExtra(EXTRA_EVENT_TYPE_ID, Integer.toString(eventTypeId));
         incrIntent.putExtra(EXTRA_DIRECTION, direction);
-        //incrIntent.putExtra(EXTRA_SOURCE, EventSource.WIDGET.getCode());
+        incrIntent.putExtra(EXTRA_CURRENT_COUNT, currentCount);
 
         int requestCode = (direction.equals("UP") ? 1 : -1) * eventTypeId;
 
@@ -88,10 +88,10 @@ public class IncrDecrTypeWidget extends AppWidgetProvider {
             views.setTextViewText(R.id.event_type_name, x.eventTypeName);
             views.setTextViewText(R.id.event_type_count, Long.toString(x.netScore));
 
-            PendingIntent incrIntent = getIntentForIncr(context, "UP", eventTypeId);
+            PendingIntent incrIntent = getIntentForIncr(context, "UP", eventTypeId, x.netScore);
             views.setOnClickPendingIntent(R.id.btn_increment, incrIntent);
 
-            PendingIntent decrIntent = getIntentForIncr(context, "DOWN", eventTypeId);
+            PendingIntent decrIntent = getIntentForIncr(context, "DOWN", eventTypeId, x.netScore);
             views.setOnClickPendingIntent(R.id.btn_decrement, decrIntent);
         } else {
             views.setTextViewText(R.id.event_type_name, context.getString(R.string.widget_big_time_error));
@@ -105,8 +105,7 @@ public class IncrDecrTypeWidget extends AppWidgetProvider {
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         // There may be multiple widgets active, so update all of them
-
-
+        // We need the database and we don't want to run on main thread so use async task
         AsyncTask.execute(
                 () -> {
                     CountedEventDatabase db = CountedEventDatabase.getInstance(context);
@@ -119,13 +118,6 @@ public class IncrDecrTypeWidget extends AppWidgetProvider {
 
                 }
         );
-
-
-//        widgetIdToEventTypes.addListener((x) -> {
-//            for (CountedWidgetIdToEventType widget : widgetIdToEventTypes.get()) {
-//                updateAppWidget(context, appWidgetManager, widget.appWidgetId, widget.eventTypeId);
-//            }
-//        }, Runnable::run);
     }
 
     private static RemoteViews getRemoteViews(Context context, long count, String eventName) {

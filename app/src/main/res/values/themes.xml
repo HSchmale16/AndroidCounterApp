@@ -19,9 +19,7 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="Theme.Counter.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-    <style name="Theme.Counter.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="ThemeOverlay.Counter.AppWidgetContainer" parent="">
         <item name="appWidgetBackgroundColor">@color/light_blue_600</item>

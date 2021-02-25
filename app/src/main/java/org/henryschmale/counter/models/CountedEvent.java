@@ -7,6 +7,7 @@ import androidx.annotation.RequiresApi;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
@@ -36,6 +37,7 @@ public class CountedEvent {
 
     public OffsetDateTime createdAt = OffsetDateTime.now();
 
+    @ColumnInfo(index = true)
     public int countedEventTypeId;
 
     public byte increment;

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 13,
-    "identityHash": "f84ca34a76f2388cb8509abdd3b080ed",
+    "identityHash": "90ba1103665dafefca8ca94d79d6cd99",
     "entities": [
       {
         "tableName": "CountedEventType",
@@ -123,7 +123,16 @@
           ],
           "autoGenerate": true
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_CountedEvent_countedEventTypeId",
+            "unique": false,
+            "columnNames": [
+              "countedEventTypeId"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_CountedEvent_countedEventTypeId` ON `${TABLE_NAME}` (`countedEventTypeId`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "CountedEventType",
@@ -198,7 +207,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f84ca34a76f2388cb8509abdd3b080ed')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '90ba1103665dafefca8ca94d79d6cd99')"
     ]
   }
 }

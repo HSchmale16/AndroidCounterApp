@@ -40,6 +40,25 @@
     <string name="widget_big_time_error">ERROR BIG TIME</string>
     <string name="increment_counter">Increment Counter</string>
     <string name="decrement_counter">Decrement Counter</string>
+    <string name="title_activity_settings">SettingsActivity</string>
 
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="extra_id_text_description">Includes an extra description for every entry of the export. Useful for merging results from multiple sources for analysis</string>
+    <string name="start_export">Start Export</string>
+
+    <string name="progress_text">%d of %d events exported</string>
 
 </resources>

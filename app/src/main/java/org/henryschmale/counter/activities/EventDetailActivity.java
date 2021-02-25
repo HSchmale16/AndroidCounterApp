@@ -5,6 +5,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -109,10 +110,12 @@ public class EventDetailActivity extends AppCompatActivity {
         CountedEventDatabase db = CountedEventDatabase.getInstance(getApplicationContext());
         LiveData<CountedEventType> eventType = db.countedEventTypeDao().getEventTypeById(targetEventTypeId);
         eventType.observe(this, countedEventType -> {
-            db.countedEventTypeDao().deleteEventType(countedEventType);
-            eventType.removeObservers(EventDetailActivity.this);
-            setResult(RESULT_OK);
-            finish();
+            eventType.removeObservers(this);
+            AsyncTask.execute(() -> {
+                db.countedEventTypeDao().deleteEventType(countedEventType);
+                setResult(RESULT_OK);
+                finish();
+            });
         });
     }
 }

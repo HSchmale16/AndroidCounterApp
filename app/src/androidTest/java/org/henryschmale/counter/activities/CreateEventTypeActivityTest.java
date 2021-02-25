@@ -41,8 +41,8 @@ public class CreateEventTypeActivityTest {
                         .perform(clearText())
                         .perform(typeText("This is a description"));
 
-
-
+                onView(withId(R.id.submit_button))
+                        .perform(click());
         }
     }
 

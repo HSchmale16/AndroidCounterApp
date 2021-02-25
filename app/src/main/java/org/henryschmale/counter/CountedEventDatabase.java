@@ -14,6 +14,7 @@ import org.henryschmale.counter.models.CountedEventType;
 import org.henryschmale.counter.models.EventTypeDetail;
 import org.henryschmale.counter.models.VoteEntryModel;
 import org.henryschmale.counter.models.CountedWidgetIdToEventType;
+import org.henryschmale.counter.models.dao.ExportDao;
 import org.henryschmale.counter.models.dao.WidgetDao;
 
 import java.time.OffsetDateTime;
@@ -37,6 +38,8 @@ public abstract class CountedEventDatabase extends RoomDatabase {
     public abstract CountedEventTypeDao countedEventTypeDao();
 
     public abstract WidgetDao widgetDao();
+
+    public abstract ExportDao exportDao();
 
     public static synchronized CountedEventDatabase getInstance(final Context context) {
         if (INSTANCE == null) {

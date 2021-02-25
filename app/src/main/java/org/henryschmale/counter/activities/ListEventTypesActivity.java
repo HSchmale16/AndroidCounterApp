@@ -30,6 +30,12 @@ import static org.henryschmale.counter.CountedEventTypeListAdapter.SortOrder.NEW
 import static org.henryschmale.counter.CountedEventTypeListAdapter.SortOrder.OLDEST_CREATED;
 import static org.henryschmale.counter.activities.CreateEventTypeActivity.CREATE_EVENT_REQUEST_CODE;
 
+
+/**
+ * Main activity. Entry point for the application.
+ *
+ * Displays a list of
+ */
 public class ListEventTypesActivity extends AppCompatActivity implements LongClickRecyclerHandler {
     public static final String TAG = "ListEventTypesActivity";
     public static final int EXPORT_REQUEST_CODE = 2;
@@ -104,6 +110,8 @@ public class ListEventTypesActivity extends AppCompatActivity implements LongCli
             intent = new Intent(this, ExportActivity.class);
             startActivityForResult(intent, EXPORT_REQUEST_CODE);
         } else if (menuItemId == R.id.menuSettings) {
+            intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
             Toast.makeText(this, R.string.to_be_implemented, Toast.LENGTH_LONG).show();
         }
 
