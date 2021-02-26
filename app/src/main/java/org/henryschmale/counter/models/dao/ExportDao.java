@@ -31,5 +31,4 @@ public interface ExportDao {
 
     @Query("SELECT COUNT(*) FROM CountedEvent")
     int totalEvents();
-
 }

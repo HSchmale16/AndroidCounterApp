@@ -40,4 +40,16 @@
         app:layout_constraintStart_toStartOf="@+id/the_progress_bar"
         app:layout_constraintTop_toBottomOf="@+id/the_progress_bar" />
 
+    <Button
+        android:id="@+id/btn_share_via"
+        android:enabled="false"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="33dp"
+        android:textAlignment="center"
+        android:text="@string/share_export_via"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/start_export" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

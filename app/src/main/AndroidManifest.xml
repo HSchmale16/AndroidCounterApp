@@ -2,12 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.henryschmale.counter">
 
+    <!--
     <uses-permission
         android:name="android.permission.ACCESS_BACKGROUND_LOCATION"
         android:requiredFeature="false" />
     <uses-permission
         android:name="android.permission.ACCESS_FINE_LOCATION"
         android:requiredFeature="false" />
+    -->
 
     <application
         android:allowBackup="true"
@@ -16,9 +18,23 @@
         android:roundIcon="@mipmap/app_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Counter">
+
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="org.henryschmale.counter.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+        </provider>
+
         <activity
             android:name=".activities.SettingsActivity"
-            android:label="@string/title_activity_settings"></activity>
+            android:label="@string/title_activity_settings" />
+
+
         <activity android:name=".activities.SetTrackedEventTypeActivity" />
 
         <service

@@ -59,6 +59,9 @@
     <string name="extra_id_text_description">Includes an extra description for every entry of the export. Useful for merging results from multiple sources for analysis</string>
     <string name="start_export">Start Export</string>
 
-    <string name="progress_text">%d of %d events exported</string>
+    <string name="progress_text">%d of %d events exported to \n %s</string>
+
+    <string name="send_to">Share your export to other apps</string>
+    <string name="share_export_via">Share Export Via</string>
 
 </resources>

@@ -1,6 +1,7 @@
 package org.henryschmale.counter.widgets;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.IntentService;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
@@ -27,9 +28,14 @@ import org.henryschmale.counter.models.EventTypeDetail;
 import org.henryschmale.counter.models.dao.ExportDao;
 import org.henryschmale.counter.utils.DateConverter;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.text.SimpleDateFormat;
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.MissingResourceException;
 
@@ -61,6 +67,7 @@ public class CountEventWidgetIntentService extends JobIntentService {
      */
     private int totalEvents;
     private int totalProcessed;
+    private String exportFileName;
     private String progressNotifyEventName;
 
 
@@ -129,9 +136,23 @@ public class CountEventWidgetIntentService extends JobIntentService {
         totalEvents = dao.totalEvents();
         progressNotifyEventName = progressNotify;
         totalProcessed = 0;
+        // start the progress meter
 
         Context context = getApplicationContext();
-        try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("export.json", Context.MODE_PRIVATE))) {
+        File parentDir = new File(context.getFilesDir(), "exports");
+        parentDir.mkdirs();
+
+        //File file = new File(parentDir, "export.json");
+
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String datePart = fmt.format(OffsetDateTime.now());
+        exportFileName = "counter_export_" + datePart + ".json";
+        File whereToPut = new File(parentDir, exportFileName);
+
+        sendProgressBroadcast(progressNotify, totalProcessed, totalEvents);
+
+        //context.openFileOutput("exports/" + exportFileName, Context.MODE_PRIVATE
+        try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(whereToPut))) {
             writeJson(dao, outputStreamWriter);
         }
     }
@@ -163,6 +184,7 @@ public class CountEventWidgetIntentService extends JobIntentService {
         json.name("eventTypeName").value(type.eventTypeName);
         json.name("eventTypeDescription").value(type.eventTypeDescription);
         json.name("createdAt").value(type.createdAt.toString());
+        json.name("exportedAsOf").value(OffsetDateTime.now().toString());
 
         // The votes are an array
         json.name("eventTypeVotes");
@@ -181,14 +203,14 @@ public class CountEventWidgetIntentService extends JobIntentService {
                 json.name("lat").value(event.latitude);
                 json.name("lon").value(event.longitude);
                 json.name("accuracy").value(event.accuracy);
+                json.name("alt").value(event.altitude);
                 json.name("source").value(event.source.toString());
 
                 json.endObject();
 
                 ++totalProcessed;
+                sendProgressBroadcast(progressNotifyEventName, totalProcessed, totalEvents);
             }
-
-            sendProgressBroadcast(progressNotifyEventName, totalProcessed, totalEvents);
         }
 
         json.endArray();
@@ -199,6 +221,7 @@ public class CountEventWidgetIntentService extends JobIntentService {
     private void sendProgressBroadcast (String notifyAction, int progress, int totalProgress) {
         Intent intent = new Intent (notifyAction); //put the same message as in the filter you used in the activity when registering the receiver
         intent.putExtra("progress", progress);
+        intent.putExtra("exportFileName", exportFileName);
         intent.putExtra("total", totalProgress);
         Log.i(TAG, "total = " + progress + " / " + totalProgress);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
