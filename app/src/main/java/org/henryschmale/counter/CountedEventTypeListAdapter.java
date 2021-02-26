@@ -123,8 +123,6 @@ public class CountedEventTypeListAdapter extends RecyclerView.Adapter<CountedEve
             itemView.setOnLongClickListener(this);
         }
 
-
-
         public void setLiveDataSource(LiveData<EventTypeDetail> details, int position) {
             // remove old references so no conflicts
             if (currentEventType != null) {
