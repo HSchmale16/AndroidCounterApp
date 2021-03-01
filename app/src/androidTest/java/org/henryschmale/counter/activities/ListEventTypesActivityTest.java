@@ -105,8 +105,12 @@ public class ListEventTypesActivityTest {
 
             onView(withId(R.id.event_type_list)).check(matches(atPosition(0, hasDescendant(withText("9")))));
 
-            // No op
+            // No op incr
             onView(withId(R.id.event_type_list))
+                    .perform(RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.btn_increment)))
+                    .perform(RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.btn_decrement)))
+                    .perform(RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.btn_increment)))
+                    .perform(RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.btn_decrement)))
                     .perform(RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.btn_increment)))
                     .perform(RecyclerViewActions.actionOnItemAtPosition(0, clickChildViewWithId(R.id.btn_decrement)));
 

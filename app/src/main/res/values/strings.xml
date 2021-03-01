@@ -63,5 +63,8 @@
 
     <string name="send_to">Share your export to other apps</string>
     <string name="share_export_via">Share Export Via</string>
+    <string name="available_previous_exports">Available Previous Exports</string>
+    <string name="share_this_export">Share this export</string>
+    <string name="delete_this_export_forever">Delete this export forever</string>
 
 </resources>

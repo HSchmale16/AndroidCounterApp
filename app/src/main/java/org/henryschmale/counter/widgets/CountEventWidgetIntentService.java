@@ -21,6 +21,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.google.gson.stream.JsonWriter;
 
 import org.henryschmale.counter.CountedEventDatabase;
+import org.henryschmale.counter.activities.ExportActivity;
 import org.henryschmale.counter.models.CountedEvent;
 import org.henryschmale.counter.models.CountedEventType;
 import org.henryschmale.counter.models.EventSource;
@@ -144,7 +145,7 @@ public class CountEventWidgetIntentService extends JobIntentService {
 
         //File file = new File(parentDir, "export.json");
 
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyyMMdd");
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyyMMdd'_'HHmmss");
         String datePart = fmt.format(OffsetDateTime.now());
         exportFileName = "counter_export_" + datePart + ".json";
         File whereToPut = new File(parentDir, exportFileName);
@@ -155,6 +156,7 @@ public class CountEventWidgetIntentService extends JobIntentService {
         try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(whereToPut))) {
             writeJson(dao, outputStreamWriter);
         }
+        sendUpdateFileList();
     }
 
     private void writeJson(ExportDao dao, OutputStreamWriter writer) {
@@ -224,6 +226,11 @@ public class CountEventWidgetIntentService extends JobIntentService {
         intent.putExtra("exportFileName", exportFileName);
         intent.putExtra("total", totalProgress);
         Log.i(TAG, "total = " + progress + " / " + totalProgress);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
+    private void sendUpdateFileList() {
+        Intent intent = new Intent(ExportActivity.ACTION_TRIGGER_EXPORT_LIST_UPDATE);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 

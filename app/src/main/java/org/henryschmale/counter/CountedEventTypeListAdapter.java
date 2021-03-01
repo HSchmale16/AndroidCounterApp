@@ -88,10 +88,7 @@ public class CountedEventTypeListAdapter extends RecyclerView.Adapter<CountedEve
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Log.d(TAG, Integer.toString(position));
-
         LiveData<EventTypeDetail> cetFuture = dao.getEventDetailById(eventTypeDetails.get(position).uid);
-
         holder.setLiveDataSource(cetFuture, position);
     }
 
