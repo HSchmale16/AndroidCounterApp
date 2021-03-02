@@ -2,13 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.henryschmale.counter">
 
+    <!--
     <uses-permission
         android:name="android.permission.ACCESS_BACKGROUND_LOCATION"
         android:requiredFeature="false" />
     <uses-permission
         android:name="android.permission.ACCESS_FINE_LOCATION"
         android:requiredFeature="false" />
-
+    -->
 
     <application
         android:allowBackup="true"
