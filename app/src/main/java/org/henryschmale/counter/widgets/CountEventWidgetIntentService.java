@@ -7,6 +7,7 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
@@ -17,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.JobIntentService;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.preference.PreferenceManager;
 
 import com.google.gson.stream.JsonWriter;
 
@@ -39,6 +41,7 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.MissingResourceException;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -144,17 +147,35 @@ public class CountEventWidgetIntentService extends JobIntentService {
         parentDir.mkdirs();
 
         //File file = new File(parentDir, "export.json");
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean gzipEnabled = prefs.getBoolean("enableGzipCompression", false);
+
+        Log.d(TAG, "GZIP status = " + gzipEnabled);
 
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyyMMdd'_'HHmmss");
         String datePart = fmt.format(OffsetDateTime.now());
         exportFileName = "counter_export_" + datePart + ".json";
+
+        if (gzipEnabled)
+            exportFileName += ".gzip";
+
         File whereToPut = new File(parentDir, exportFileName);
 
         sendProgressBroadcast(progressNotify, totalProcessed, totalEvents);
 
         //context.openFileOutput("exports/" + exportFileName, Context.MODE_PRIVATE
-        try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(whereToPut))) {
-            writeJson(dao, outputStreamWriter);
+        try (FileOutputStream fos = new FileOutputStream(whereToPut)) {
+            if (gzipEnabled) {
+                try (GZIPOutputStream gzipOutputStream = new GZIPOutputStream(fos)) {
+                    try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(gzipOutputStream)) {
+                        writeJson(dao, outputStreamWriter);
+                    }
+                }
+            } else {
+                try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fos)) {
+                    writeJson(dao, outputStreamWriter);
+                }
+            }
         }
         sendUpdateFileList();
     }
