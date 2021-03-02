@@ -66,5 +66,8 @@
     <string name="available_previous_exports">Available Previous Exports</string>
     <string name="share_this_export">Share this export</string>
     <string name="delete_this_export_forever">Delete this export forever</string>
+    <string name="delete_export_msg">Are you sure you want to delete this export?</string>
+    <string name="delete_export">Delete Export?</string>
+    <string name="do_not_delete_export">No I don\'t want to delete this export</string>
 
 </resources>

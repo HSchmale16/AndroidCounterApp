@@ -235,10 +235,10 @@ public class ExportActivity extends AppCompatActivity {
                     };
                     AlertDialog.Builder builder = new AlertDialog.Builder(context);
                     builder
-                            .setMessage(R.string.dialog_delete_event_type)
-                            .setTitle(R.string.title_delete_event_type)
+                            .setMessage(R.string.delete_export_msg)
+                            .setTitle(R.string.delete_export)
                             .setPositiveButton(R.string.delete_affirmative, dialogClickListener)
-                            .setNegativeButton(R.string.delete_negative, dialogClickListener)
+                            .setNegativeButton(R.string.do_not_delete_export, dialogClickListener)
                             .show();
                 } else {
                     Log.d(TAG, "Received click that isn't mine");
